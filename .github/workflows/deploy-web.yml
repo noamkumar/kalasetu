@@ -27,6 +27,26 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Validate Vercel Secrets
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error::Secret VERCEL_TOKEN is not configured in GitHub repository secrets."
+            exit 1
+          fi
+          if [ -z "$VERCEL_ORG_ID" ]; then
+            echo "::error::Secret VERCEL_ORG_ID is not configured in GitHub repository secrets."
+            exit 1
+          fi
+          if [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "::error::Secret VERCEL_PROJECT_ID is not configured in GitHub repository secrets."
+            exit 1
+          fi
+          echo "Verified required Vercel repository secrets are present."
+
       - name: Set up Flutter SDK
         uses: subosito/flutter-action@v2
         with:
@@ -52,7 +72,7 @@ jobs:
         run: |
           # Copy vercel.json into the web build directory for SPA rewrites and security headers
           cp frontend/vercel.json frontend/build/web/vercel.json
-          # Write Vercel project linkage
+          # Write Vercel project linkage to target existing project
           node -e "
             const fs = require('fs');
             fs.mkdirSync('frontend/build/web/.vercel', { recursive: true });

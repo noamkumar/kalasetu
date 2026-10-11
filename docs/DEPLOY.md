@@ -114,18 +114,50 @@ To ensure no photo upload depends on ephemeral local disk in production:
 
 ---
 
-## 5. Flutter Web Deployment to Vercel
+## 5. Flutter Web Deployment to Vercel via GitHub Actions
 
-1. Build the web app locally or via CI:
-   ```powershell
-   ./scripts/build_web.ps1 -ApiBaseUrl "https://kalasetu-backend.onrender.com/api/v1"
+KalaSetu uses an automated GitHub Actions CI/CD workflow (`.github/workflows/deploy-web.yml`) to compile Flutter Web in release mode and deploy directly to Vercel using the official Vercel CLI.
+
+### 5.1 Required GitHub Actions Secrets
+In your GitHub repository (`https://github.com/noamkumar/kalasetu`), go to **Settings** > **Secrets and variables** > **Actions** and add the following repository secrets:
+
+| Secret Name | Description | Where to Find in Vercel |
+| :--- | :--- | :--- |
+| `VERCEL_TOKEN` | Vercel Personal Access Token | [Vercel Account Settings > Tokens](https://vercel.com/account/tokens) -> Create Token |
+| `VERCEL_ORG_ID` | Vercel Team or User ID | In local directory run `npx vercel link` (inspect `.vercel/project.json` -> `orgId`) or Vercel Team Settings |
+| `VERCEL_PROJECT_ID` | Vercel Project ID | In Vercel Project > **Settings** > **General** > **Project ID** (or `.vercel/project.json` -> `projectId`) |
+
+### 5.2 CI/CD Workflow Execution
+The workflow (`.github/workflows/deploy-web.yml`):
+1. Checks out the repository.
+2. Installs the stable Flutter SDK via `subosito/flutter-action@v2` with dependency caching.
+3. Runs `flutter pub get` in `frontend/`.
+4. Compiles Flutter Web in release mode:
+   ```bash
+   flutter build web --release --no-tree-shake-icons --dart-define=API_BASE_URL=https://kalasetu-backend-s3uq.onrender.com/api/v1
    ```
-2. In the Vercel Dashboard, import the repository:
-   - **Framework Preset**: Other
-   - **Root Directory**: `frontend`
-   - **Build Command**: `flutter build web --release --no-tree-shake-icons --dart-define=API_BASE_URL=https://<your-backend>.onrender.com/api/v1`
-   - **Output Directory**: `build/web`
-3. `vercel.json` provides automatic SPA routing (`/*` -> `/index.html`).
+5. Bundles `frontend/vercel.json` (SPA rewrite rule `/*` -> `/index.html` and HTTPS `Permissions-Policy` headers) with the compiled assets in `frontend/build/web/`.
+6. Deploys to Vercel production using:
+   ```bash
+   vercel deploy --prod --yes --token="$VERCEL_TOKEN"
+   ```
+
+### 5.3 Triggering the Deployment
+- **Automatic**: Pushes to `main` touching `frontend/**`, `vercel.json`, or `.github/workflows/deploy-web.yml` trigger an automated build and deployment.
+- **Manual**: Go to **Actions** > **Deploy Flutter Web to Vercel** > **Run workflow** (with optional custom API base URL).
+
+### 5.4 Local Web Build & Preview
+To build and preview locally before deploying:
+```powershell
+# Build locally targeting production backend
+.\scripts\build_web.ps1 -ApiBaseUrl "https://kalasetu-backend-s3uq.onrender.com/api/v1"
+
+# Preview locally with a static server
+npx serve -s frontend\build\web
+
+# Or deploy manually using Vercel CLI
+npx vercel deploy frontend\build\web --prod
+```
 
 ---
 

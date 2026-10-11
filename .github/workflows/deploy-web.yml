@@ -1,0 +1,75 @@
+name: Deploy Flutter Web to Vercel
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-web.yml'
+      - 'vercel.json'
+  workflow_dispatch:
+    inputs:
+      api_base_url:
+        description: 'Backend API Base URL'
+        required: false
+        default: 'https://kalasetu-backend-s3uq.onrender.com/api/v1'
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy Web
+    runs-on: ubuntu-latest
+
+    env:
+      API_BASE_URL: ${{ github.event.inputs.api_base_url || 'https://kalasetu-backend-s3uq.onrender.com/api/v1' }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Verify Flutter Version
+        run: flutter --version
+
+      - name: Install Frontend Dependencies
+        working-directory: frontend
+        run: flutter pub get
+
+      - name: Build Flutter Web (Release)
+        working-directory: frontend
+        run: |
+          flutter build web --release --no-tree-shake-icons --dart-define=API_BASE_URL="${{ env.API_BASE_URL }}"
+
+      - name: Prepare Vercel Static Bundle
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          # Copy vercel.json into the web build directory for SPA rewrites and security headers
+          cp frontend/vercel.json frontend/build/web/vercel.json
+          # Write Vercel project linkage
+          node -e "
+            const fs = require('fs');
+            fs.mkdirSync('frontend/build/web/.vercel', { recursive: true });
+            fs.writeFileSync('frontend/build/web/.vercel/project.json', JSON.stringify({
+              orgId: process.env.VERCEL_ORG_ID || '',
+              projectId: process.env.VERCEL_PROJECT_ID || ''
+            }, null, 2));
+          "
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Deploy to Vercel Production
+        working-directory: frontend/build/web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          vercel deploy --prod --yes --token="${{ secrets.VERCEL_TOKEN }}"

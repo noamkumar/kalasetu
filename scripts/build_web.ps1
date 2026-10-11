@@ -4,7 +4,7 @@
 # ==============================================================================
 [CmdletBinding()]
 param (
-    [string]$ApiBaseUrl = "https://kalasetu-backend.onrender.com/api/v1"
+    [string]$ApiBaseUrl = "https://kalasetu-backend-s3uq.onrender.com/api/v1"
 )
 
 $ErrorActionPreference = "Stop"
@@ -33,14 +33,18 @@ try {
 
     $OutputDir = Join-Path $FrontendDir "build\web"
     $IndexFile = Join-Path $OutputDir "index.html"
+    $VercelConfig = Join-Path $FrontendDir "vercel.json"
 
     if (Test-Path $IndexFile) {
+        if (Test-Path $VercelConfig) {
+            Copy-Item -Path $VercelConfig -Destination (Join-Path $OutputDir "vercel.json") -Force
+        }
         Write-Host "`n[3/3] Build Succeeded!" -ForegroundColor Green
         Write-Host "Output bundle: $OutputDir" -ForegroundColor White
         Write-Host "`nTo preview locally with a static server:" -ForegroundColor Cyan
         Write-Host "  npx serve -s frontend\build\web" -ForegroundColor White
         Write-Host "To deploy to Vercel:" -ForegroundColor Cyan
-        Write-Host "  npx vercel --prod frontend\build\web`n" -ForegroundColor White
+        Write-Host "  npx vercel deploy frontend\build\web --prod`n" -ForegroundColor White
     } else {
         Write-Error "Build output index.html not found in $OutputDir"
         exit 1

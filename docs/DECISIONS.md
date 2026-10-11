@@ -745,3 +745,15 @@ This log documents all architectural choices, assumptions, trade-offs, and defau
   5. Flutter Web Deployment (Vercel SPA)
   6. Android Release Distribution (Signed APK)
   7. Repository Security & Zero Committed Secrets
+
+---
+
+## Decision 037: Automated Flutter Web CI/CD Deployment to Vercel via GitHub Actions
+- **Date**: 2026-10-11
+- **Status**: Accepted
+- **Context**: Configured automated GitHub Actions deployment for KalaSetu Flutter Web to Vercel using the official Vercel CLI and repository secrets (VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID), targeting production backend https://kalasetu-backend-s3uq.onrender.com/api/v1.
+- **Architectural Implementation**:
+  1. CI/CD Workflow (.github/workflows/deploy-web.yml): Compiles Flutter Web release with stable channel, dependency caching, and --no-tree-shake-icons.
+  2. Vercel Static Bundle: Bundles vercel.json with SPA rewrites (/* -> /index.html) and HTTPS Permissions-Policy headers (camera=*, microphone=*).
+  3. Security: Credentials strictly consumed via GitHub Secrets; zero tokens or IDs hardcoded in repository.
+  4. Build Script Parity: Updated scripts/build_web.ps1 to default to https://kalasetu-backend-s3uq.onrender.com/api/v1.

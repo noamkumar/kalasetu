@@ -1,0 +1,321 @@
+category,material,size_cm,technique,region,material_cost,labour_hours,final_price,quality_score
+pottery,terracotta,22.2,wheel-thrown,GJ,73.5,2.4,549,88.0
+pottery,stoneware,11.6,wheel-thrown,KA,62.5,3.5,699,83.7
+pottery,stoneware,21.0,terracotta-etched,KA,181.4,8.4,1699,65.2
+pottery,red-clay,23.9,pit-fired,KL,91.7,8.0,1499,68.2
+pottery,ceramic-glaze,52.4,wheel-thrown,KL,184.9,8.4,1799,87.6
+pottery,stoneware,13.9,wheel-thrown,KA,110.4,6.8,1399,92.4
+pottery,black-clay,45.2,slip-decorated,WB,51.0,3.4,649,74.0
+pottery,terracotta,29.0,terracotta-etched,TN,148.8,8.6,1699,70.0
+pottery,black-clay,45.1,terracotta-etched,GJ,204.1,2.1,749,84.7
+pottery,stoneware,33.1,terracotta-etched,RJ,104.8,9.4,1799,86.3
+pottery,red-clay,21.5,hand-coiled,UP,47.7,4.2,749,73.3
+pottery,red-clay,20.6,slip-decorated,KL,159.8,9.0,1799,84.9
+pottery,red-clay,22.3,hand-coiled,RJ,174.7,3.7,949,83.1
+pottery,stoneware,21.0,pit-fired,KL,279.4,5.8,1399,67.8
+pottery,terracotta,41.4,wheel-thrown,RJ,230.1,5.1,1299,67.0
+pottery,ceramic-glaze,36.5,slip-decorated,MP,273.1,8.8,1899,65.4
+pottery,terracotta,48.4,slip-decorated,GJ,121.6,4.0,899,69.9
+pottery,terracotta,35.4,hand-coiled,RJ,65.5,6.8,1299,91.1
+pottery,stoneware,17.6,slip-decorated,WB,223.0,6.1,1499,89.1
+pottery,stoneware,34.4,wheel-thrown,KL,66.8,4.6,899,95.5
+pottery,black-clay,22.0,terracotta-etched,UP,176.2,2.2,699,87.7
+pottery,terracotta,16.4,slip-decorated,RJ,154.1,6.2,1299,73.2
+pottery,stoneware,56.4,pit-fired,WB,221.3,7.4,1699,87.1
+pottery,ceramic-glaze,55.0,hand-coiled,MP,148.4,3.6,849,67.0
+pottery,terracotta,39.4,slip-decorated,WB,41.7,7.5,1299,66.8
+pottery,terracotta,13.5,wheel-thrown,KL,97.1,7.2,1299,71.6
+pottery,red-clay,22.1,slip-decorated,MP,153.5,5.0,1099,67.9
+pottery,ceramic-glaze,30.6,hand-coiled,KA,247.3,2.0,799,85.3
+pottery,terracotta,46.4,wheel-thrown,KA,232.1,2.4,799,70.9
+pottery,stoneware,31.1,pit-fired,RJ,106.9,3.6,799,93.6
+pottery,ceramic-glaze,12.5,slip-decorated,TN,279.8,8.6,1999,95.0
+pottery,red-clay,34.3,terracotta-etched,KA,91.3,4.9,949,66.8
+pottery,ceramic-glaze,23.3,wheel-thrown,KA,228.2,5.4,1299,78.1
+pottery,stoneware,19.5,pit-fired,RJ,92.2,2.0,499,87.8
+pottery,terracotta,12.5,hand-coiled,UP,154.4,9.3,1799,81.5
+pottery,terracotta,52.6,slip-decorated,TN,56.4,2.1,499,91.7
+pottery,ceramic-glaze,38.9,wheel-thrown,WB,49.5,2.2,499,85.4
+pottery,stoneware,56.7,slip-decorated,KL,89.0,7.6,1399,72.4
+pottery,ceramic-glaze,32.9,terracotta-etched,GJ,263.0,9.5,1999,65.3
+pottery,stoneware,13.7,slip-decorated,TN,91.2,3.8,799,93.9
+pottery,terracotta,24.2,terracotta-etched,KL,145.2,6.1,1299,74.4
+pottery,stoneware,56.6,wheel-thrown,GJ,64.9,9.0,1599,73.2
+pottery,terracotta,23.6,slip-decorated,RJ,185.2,7.6,1599,71.3
+pottery,black-clay,22.6,slip-decorated,MP,258.0,1.9,799,84.7
+pottery,black-clay,26.7,wheel-thrown,UP,71.4,9.8,1699,70.0
+pottery,ceramic-glaze,38.0,slip-decorated,KA,66.8,9.5,1699,86.4
+pottery,red-clay,51.7,slip-decorated,UP,179.8,2.8,799,69.0
+pottery,black-clay,54.9,hand-coiled,UP,90.4,3.6,749,68.2
+pottery,stoneware,56.3,pit-fired,RJ,96.8,2.9,699,89.8
+pottery,red-clay,19.0,pit-fired,UP,261.9,8.2,1799,77.8
+pottery,red-clay,49.4,hand-coiled,RJ,65.9,8.9,1699,91.6
+pottery,red-clay,27.5,terracotta-etched,MP,236.9,8.9,1899,71.9
+pottery,red-clay,23.9,pit-fired,KL,56.7,8.1,1399,75.9
+pottery,stoneware,57.0,pit-fired,KL,67.7,9.7,1699,70.5
+pottery,black-clay,39.8,wheel-thrown,TN,123.0,8.2,1599,78.5
+pottery,stoneware,55.0,wheel-thrown,KA,85.6,1.9,499,78.5
+pottery,stoneware,28.2,slip-decorated,WB,56.8,7.1,1299,75.2
+pottery,black-clay,35.4,wheel-thrown,GJ,200.1,4.3,1099,86.6
+pottery,stoneware,31.0,terracotta-etched,WB,265.7,7.3,1799,93.0
+pottery,stoneware,30.3,slip-decorated,GJ,240.1,4.1,1099,71.5
+pottery,stoneware,33.2,slip-decorated,KL,146.1,3.3,799,79.7
+pottery,red-clay,35.8,wheel-thrown,GJ,191.9,4.3,1099,90.4
+pottery,red-clay,50.3,hand-coiled,WB,75.4,1.9,499,95.5
+pottery,stoneware,30.7,wheel-thrown,MP,191.1,3.2,899,86.6
+handloom,tussar-silk,79.5,jamdani,TS,1575.2,29.1,9699,91.7
+handloom,cotton,85.2,jamdani,TS,2115.9,19.0,8499,66.6
+handloom,mulberry-silk,76.7,ikkat,MP,1129.3,19.3,6499,82.3
+handloom,khadi,216.1,jamdani,KA,1295.7,29.2,9999,88.1
+handloom,tussar-silk,200.4,jamdani,TN,1879.7,12.5,7499,89.1
+handloom,tussar-silk,138.0,banarasi-zari,TN,1627.1,11.3,5999,75.4
+handloom,linen-blend,80.2,ikkat,AP,966.1,9.1,3999,71.6
+handloom,tussar-silk,158.5,jamdani,GJ,1031.5,10.6,4999,78.0
+handloom,linen-blend,145.4,ikkat,KA,2085.5,13.1,7499,77.1
+handloom,tussar-silk,147.6,chanderi-weave,TS,745.9,18.1,5999,77.1
+handloom,tussar-silk,233.9,banarasi-zari,MP,2161.4,19.4,9799,93.1
+handloom,linen-blend,66.8,chanderi-weave,WB,1057.2,28.4,8499,70.6
+handloom,khadi,92.3,jamdani,GJ,853.7,25.6,7499,76.8
+handloom,tussar-silk,144.1,hand-block-print,UP,1698.0,6.4,5499,94.5
+handloom,mulberry-silk,200.8,ikkat,WB,2099.2,10.4,6999,65.6
+handloom,mulberry-silk,144.7,banarasi-zari,AP,428.8,30.6,7999,79.4
+handloom,khadi,171.2,hand-block-print,AP,2127.5,24.4,10399,89.1
+handloom,mulberry-silk,165.7,hand-block-print,UP,2057.8,20.5,9399,93.1
+handloom,tussar-silk,65.2,jamdani,TS,1581.2,21.9,7999,68.2
+handloom,khadi,209.2,chanderi-weave,UP,1331.9,6.1,4499,81.5
+handloom,khadi,52.5,ikkat,GJ,1040.1,18.2,5999,78.4
+handloom,khadi,137.1,jamdani,AP,1667.6,31.1,10399,73.4
+handloom,linen-blend,137.1,jamdani,MP,1662.1,12.2,6499,91.4
+handloom,cotton,98.8,hand-block-print,MP,1129.4,21.5,6999,76.7
+handloom,cotton,86.4,jamdani,GJ,624.2,26.5,6999,75.6
+handloom,linen-blend,153.3,hand-block-print,WB,582.1,11.5,3999,77.6
+handloom,linen-blend,179.2,banarasi-zari,MP,1181.6,26.4,8499,67.9
+handloom,mulberry-silk,111.2,jamdani,TS,1363.1,17.8,6999,81.5
+handloom,tussar-silk,120.4,chanderi-weave,GJ,1107.5,13.3,5499,72.1
+handloom,mulberry-silk,198.6,hand-block-print,UP,2101.8,23.6,9899,70.9
+handloom,tussar-silk,246.1,hand-block-print,TN,1865.3,13.0,7499,76.2
+handloom,khadi,104.9,ikkat,AP,2148.6,19.9,8999,86.6
+handloom,mulberry-silk,224.5,jamdani,UP,1348.1,17.7,7499,78.7
+handloom,mulberry-silk,238.2,ikkat,TN,1155.5,27.2,9099,77.4
+handloom,cotton,80.3,chanderi-weave,WB,1822.3,30.6,9999,67.6
+handloom,mulberry-silk,171.3,ikkat,KA,1781.5,11.1,6499,81.2
+handloom,tussar-silk,222.0,jamdani,TN,2180.1,13.2,8499,84.3
+handloom,linen-blend,175.1,ikkat,TS,729.3,7.2,3299,72.4
+handloom,linen-blend,50.5,ikkat,AP,1101.0,21.0,6999,74.0
+handloom,mulberry-silk,190.6,hand-block-print,TN,1108.1,23.6,8499,93.6
+handloom,linen-blend,73.0,banarasi-zari,KA,649.6,9.0,3299,73.2
+handloom,mulberry-silk,83.2,ikkat,WB,815.2,25.2,7499,82.6
+handloom,khadi,143.7,jamdani,UP,808.2,15.9,5499,73.4
+handloom,linen-blend,66.1,jamdani,MP,279.7,16.7,4499,75.0
+handloom,khadi,95.8,ikkat,UP,1548.6,28.2,9399,83.2
+handloom,cotton,202.6,hand-block-print,WB,550.4,19.0,5999,78.7
+handloom,khadi,177.0,banarasi-zari,KA,1183.5,7.5,4499,75.8
+handloom,khadi,221.5,hand-block-print,UP,859.6,23.7,7499,73.9
+handloom,tussar-silk,141.0,chanderi-weave,WB,829.0,13.7,5499,95.1
+handloom,tussar-silk,181.5,chanderi-weave,WB,1285.2,16.2,6499,70.8
+handloom,khadi,175.1,chanderi-weave,MP,1720.0,10.5,6499,82.0
+handloom,khadi,74.3,jamdani,MP,2146.3,21.4,8999,72.4
+handloom,mulberry-silk,160.5,hand-block-print,WB,386.4,31.8,8499,93.3
+handloom,tussar-silk,149.7,ikkat,AP,1633.2,18.7,7999,73.5
+handloom,tussar-silk,141.4,jamdani,TS,489.3,10.1,3499,83.6
+handloom,mulberry-silk,204.5,ikkat,TN,1908.8,14.2,7999,89.4
+handloom,khadi,195.2,ikkat,TN,1875.0,20.7,8999,85.5
+handloom,mulberry-silk,119.0,jamdani,MP,1303.8,19.7,7499,79.1
+handloom,khadi,164.4,banarasi-zari,TS,667.1,25.9,7499,66.4
+handloom,tussar-silk,247.7,jamdani,KA,1784.8,22.6,9299,69.7
+handloom,cotton,223.9,banarasi-zari,GJ,1948.4,16.9,8499,81.3
+handloom,tussar-silk,132.0,ikkat,AP,1509.6,9.2,5499,79.6
+handloom,khadi,180.0,hand-block-print,KA,1903.5,28.0,10899,91.6
+handloom,tussar-silk,224.5,hand-block-print,MP,271.8,6.8,2299,84.6
+jewelry,terracotta-beads,6.3,dhokra-lost-wax,KA,833.5,9.6,4499,86.8
+jewelry,brass,22.0,tribal-emboss,RJ,776.6,2.5,2299,89.7
+jewelry,terracotta-beads,15.2,meenakari,MP,275.6,6.1,2199,86.1
+jewelry,german-silver,6.1,dhokra-lost-wax,RJ,751.8,8.2,3499,72.5
+jewelry,lac-resin,16.0,dhokra-lost-wax,RJ,283.0,4.6,1699,65.3
+jewelry,copper,18.2,meenakari,KA,146.1,11.5,3299,95.6
+jewelry,terracotta-beads,10.5,tribal-emboss,KA,732.4,4.0,2499,76.9
+jewelry,copper,13.9,filigree,RJ,362.8,5.0,1999,86.7
+jewelry,brass,4.2,tribal-emboss,MP,747.5,9.8,3999,95.2
+jewelry,lac-resin,27.5,tribal-emboss,GJ,307.5,10.0,3299,83.8
+jewelry,terracotta-beads,8.9,dhokra-lost-wax,KA,280.5,9.6,2999,88.8
+jewelry,german-silver,20.8,filigree,KA,324.8,6.4,2299,83.0
+jewelry,german-silver,12.5,filigree,MP,405.8,4.0,1899,89.4
+jewelry,terracotta-beads,27.8,kundan-foil,WB,721.2,4.6,2799,90.6
+jewelry,copper,26.6,meenakari,KA,701.2,6.7,2999,67.3
+jewelry,german-silver,24.9,tribal-emboss,GJ,368.0,9.9,3299,65.4
+jewelry,lac-resin,13.6,filigree,KL,659.2,4.6,2499,76.8
+jewelry,terracotta-beads,10.1,filigree,KA,109.0,10.8,2999,82.4
+jewelry,lac-resin,5.6,dhokra-lost-wax,KA,716.1,11.1,4499,74.4
+jewelry,copper,5.2,filigree,RJ,118.3,12.0,3299,68.6
+jewelry,german-silver,14.1,kundan-foil,RJ,372.0,11.5,3999,86.6
+jewelry,lac-resin,23.3,tribal-emboss,WB,207.4,6.1,1899,68.1
+jewelry,copper,28.4,kundan-foil,KL,302.6,8.9,2799,71.7
+jewelry,copper,13.4,dhokra-lost-wax,GJ,835.5,5.7,3299,93.0
+jewelry,terracotta-beads,11.2,filigree,KL,825.8,11.5,4999,90.5
+jewelry,brass,20.6,dhokra-lost-wax,KA,828.0,2.5,2299,75.3
+jewelry,german-silver,5.8,kundan-foil,RJ,671.5,4.1,2299,71.7
+jewelry,german-silver,7.8,meenakari,GJ,774.4,2.0,2199,91.6
+jewelry,german-silver,10.5,dhokra-lost-wax,WB,222.6,8.6,2499,65.8
+jewelry,brass,24.5,meenakari,GJ,537.5,2.2,1699,73.2
+jewelry,german-silver,7.0,tribal-emboss,WB,138.3,6.5,1899,76.2
+jewelry,lac-resin,17.1,filigree,KL,808.5,2.4,2299,89.3
+jewelry,lac-resin,20.7,meenakari,KL,113.7,12.0,3299,91.3
+jewelry,copper,22.5,filigree,KL,427.1,11.0,3999,75.0
+jewelry,german-silver,11.2,filigree,RJ,571.1,7.5,2999,75.1
+jewelry,lac-resin,15.8,kundan-foil,MP,550.1,3.0,1899,86.8
+jewelry,lac-resin,15.7,dhokra-lost-wax,KL,263.7,5.4,1899,79.1
+jewelry,copper,15.1,filigree,MP,595.5,5.7,2799,69.7
+jewelry,copper,25.6,filigree,OD,160.9,3.0,1099,87.9
+jewelry,german-silver,19.2,kundan-foil,OD,516.8,5.3,2299,68.8
+jewelry,terracotta-beads,27.8,tribal-emboss,GJ,129.1,4.9,1499,74.7
+jewelry,brass,9.5,kundan-foil,WB,589.1,4.2,2199,68.4
+jewelry,lac-resin,23.8,meenakari,OD,526.3,10.1,3999,91.2
+jewelry,lac-resin,20.7,kundan-foil,KA,110.0,11.3,3299,90.7
+jewelry,terracotta-beads,11.1,filigree,RJ,669.4,11.2,4499,75.9
+jewelry,german-silver,21.1,dhokra-lost-wax,WB,142.9,9.4,2799,95.1
+jewelry,brass,13.8,kundan-foil,RJ,434.8,3.6,1799,74.7
+jewelry,terracotta-beads,6.2,kundan-foil,WB,130.0,3.6,1199,84.2
+jewelry,brass,21.2,meenakari,KL,459.1,6.4,2499,73.5
+jewelry,lac-resin,15.2,filigree,MP,305.3,8.8,2799,80.1
+jewelry,terracotta-beads,14.3,filigree,RJ,545.5,2.1,1599,74.3
+jewelry,german-silver,10.6,dhokra-lost-wax,GJ,339.4,2.1,1299,88.2
+jewelry,german-silver,17.8,dhokra-lost-wax,KL,264.9,7.6,2499,85.7
+jewelry,terracotta-beads,26.4,filigree,KL,122.1,2.2,849,93.6
+jewelry,terracotta-beads,18.9,kundan-foil,KL,629.2,6.2,2799,68.6
+jewelry,brass,24.8,meenakari,RJ,559.8,10.3,3999,93.5
+jewelry,brass,6.8,tribal-emboss,GJ,421.1,6.0,2299,67.4
+jewelry,terracotta-beads,12.7,meenakari,RJ,217.8,7.1,2199,68.5
+jewelry,lac-resin,13.1,dhokra-lost-wax,GJ,642.8,10.2,3999,90.3
+jewelry,german-silver,10.7,filigree,RJ,221.9,3.5,1399,88.5
+jewelry,brass,20.3,dhokra-lost-wax,GJ,442.6,7.6,2799,83.0
+jewelry,lac-resin,26.5,kundan-foil,MP,566.7,3.5,1999,67.1
+jewelry,copper,11.1,meenakari,GJ,132.7,7.1,1999,74.6
+jewelry,copper,13.6,filigree,OD,308.2,8.4,2799,95.3
+wood craft,sheesham,43.0,turning,TN,712.3,12.4,3999,89.5
+wood craft,sheesham,52.4,brass-inlay,TN,531.6,11.1,3299,69.7
+wood craft,sheesham,62.7,brass-inlay,KA,1191.8,19.7,6499,67.6
+wood craft,teak-wood,56.0,jali-lattice-carving,UP,1388.5,11.9,5499,83.9
+wood craft,mango-wood,35.2,relief-carving,RJ,1111.3,14.5,4999,66.6
+wood craft,mango-wood,16.1,jali-lattice-carving,RJ,988.3,7.8,3499,87.4
+wood craft,haldu-wood,15.3,channapatna-lacquer,RJ,969.4,18.6,5499,74.6
+wood craft,rosewood,56.1,channapatna-lacquer,TN,228.4,12.5,2999,84.9
+wood craft,mango-wood,55.7,channapatna-lacquer,AP,1332.3,20.0,6999,93.3
+wood craft,sheesham,33.5,brass-inlay,TN,584.1,6.1,2299,71.6
+wood craft,rosewood,75.0,channapatna-lacquer,UP,318.3,8.0,2299,89.4
+wood craft,haldu-wood,67.4,turning,AP,168.3,8.7,2199,88.8
+wood craft,teak-wood,20.0,turning,KL,351.5,14.8,3999,84.4
+wood craft,teak-wood,36.7,brass-inlay,KA,985.7,7.0,3299,78.8
+wood craft,mango-wood,44.7,brass-inlay,UP,516.1,16.7,4499,79.5
+wood craft,teak-wood,71.6,relief-carving,AP,1380.1,10.8,4999,73.7
+wood craft,rosewood,37.2,turning,TN,327.4,6.4,1899,83.7
+wood craft,mango-wood,41.2,jali-lattice-carving,AP,595.2,18.9,4999,87.1
+wood craft,haldu-wood,15.5,jali-lattice-carving,RJ,325.2,10.6,2799,80.9
+wood craft,rosewood,63.1,jali-lattice-carving,UP,1252.3,18.8,6499,77.9
+wood craft,rosewood,25.3,turning,RJ,1393.0,9.4,4499,65.9
+wood craft,sheesham,18.9,relief-carving,UP,487.2,17.1,4499,86.6
+wood craft,teak-wood,50.0,brass-inlay,KL,1279.5,3.3,3299,71.7
+wood craft,teak-wood,49.6,turning,AP,661.8,16.2,4499,72.4
+wood craft,sheesham,37.3,jali-lattice-carving,UP,1136.2,10.8,4499,68.4
+wood craft,rosewood,11.1,turning,TN,779.7,7.1,2799,69.5
+wood craft,rosewood,32.9,jali-lattice-carving,TN,850.4,6.2,2999,85.7
+wood craft,haldu-wood,72.0,relief-carving,KA,816.4,16.4,4999,80.7
+wood craft,sheesham,12.8,brass-inlay,KL,615.2,9.3,2999,88.2
+wood craft,mango-wood,25.7,jali-lattice-carving,RJ,961.1,4.8,2799,83.0
+wood craft,mango-wood,32.9,channapatna-lacquer,KA,553.3,13.9,3999,90.7
+wood craft,rosewood,21.8,brass-inlay,AP,292.6,15.2,3999,94.3
+wood craft,sheesham,12.8,relief-carving,UP,375.3,3.7,1499,93.9
+wood craft,haldu-wood,40.8,brass-inlay,TN,166.9,14.0,3299,73.9
+wood craft,sheesham,18.1,relief-carving,RJ,591.1,18.1,4999,88.0
+wood craft,rosewood,42.3,relief-carving,UP,756.8,18.7,5499,81.1
+wood craft,sheesham,38.0,brass-inlay,KA,1393.7,6.1,3999,74.1
+wood craft,sheesham,53.0,jali-lattice-carving,RJ,512.3,13.2,3999,78.2
+wood craft,rosewood,12.8,relief-carving,KL,1233.6,9.0,4499,95.9
+wood craft,mango-wood,53.6,jali-lattice-carving,KA,639.9,11.7,3999,88.2
+wood craft,teak-wood,65.2,jali-lattice-carving,UP,988.0,10.4,3999,68.9
+wood craft,teak-wood,34.9,relief-carving,RJ,846.1,13.3,4499,86.1
+wood craft,mango-wood,59.6,relief-carving,KL,854.6,12.0,3999,77.3
+wood craft,mango-wood,11.7,channapatna-lacquer,KA,358.1,11.8,3299,93.3
+wood craft,sheesham,55.8,relief-carving,RJ,394.7,13.4,3499,86.5
+wood craft,rosewood,18.8,channapatna-lacquer,KA,214.8,5.9,1599,87.1
+wood craft,sheesham,32.6,relief-carving,AP,203.1,12.2,2999,92.6
+wood craft,teak-wood,43.1,channapatna-lacquer,RJ,275.3,6.4,1799,69.3
+wood craft,rosewood,46.0,jali-lattice-carving,RJ,592.2,16.7,4499,82.1
+wood craft,haldu-wood,30.1,jali-lattice-carving,KA,1399.5,15.2,5999,81.3
+wood craft,rosewood,18.1,turning,KA,525.8,4.3,1799,79.4
+wood craft,haldu-wood,67.1,relief-carving,UP,1118.7,13.9,4999,70.6
+wood craft,teak-wood,69.2,brass-inlay,TN,190.9,5.1,1399,69.7
+wood craft,teak-wood,70.8,channapatna-lacquer,RJ,408.6,19.1,4999,81.1
+wood craft,mango-wood,22.8,jali-lattice-carving,RJ,1344.1,7.7,4499,84.4
+wood craft,haldu-wood,42.7,turning,KA,335.9,19.0,4499,69.8
+wood craft,haldu-wood,64.8,turning,RJ,841.4,17.0,4999,65.9
+wood craft,sheesham,52.3,turning,RJ,1101.7,10.1,4499,84.8
+wood craft,rosewood,51.7,turning,RJ,506.7,7.2,2499,90.0
+wood craft,rosewood,14.7,relief-carving,KL,196.7,10.5,2499,80.0
+wood craft,teak-wood,19.3,relief-carving,TN,1222.7,8.4,4499,95.6
+wood craft,mango-wood,59.4,brass-inlay,UP,779.2,4.8,2499,72.5
+wood craft,sheesham,26.1,relief-carving,KL,243.9,7.9,1999,76.9
+wood craft,haldu-wood,72.6,brass-inlay,UP,1275.0,16.8,6499,93.9
+bamboo,treated-bamboo,26.2,lattice-bending,KA,448.4,5.3,1699,92.3
+bamboo,reed-grass,81.2,basket-weaving,AS,252.2,8.8,1999,71.7
+bamboo,treated-bamboo,34.7,basket-weaving,AS,289.0,7.9,1899,85.8
+bamboo,treated-bamboo,22.5,basket-weaving,KA,103.6,3.9,849,76.3
+bamboo,reed-grass,43.0,splint-braiding,AS,278.1,3.4,1099,82.1
+bamboo,cane,46.5,mat-plaiting,OD,269.9,7.8,1799,84.3
+bamboo,golden-grass,83.3,basket-weaving,TR,207.6,7.6,1699,75.5
+bamboo,treated-bamboo,57.2,lattice-bending,TR,210.6,2.3,749,66.2
+bamboo,treated-bamboo,47.0,mat-plaiting,OD,292.5,5.6,1499,75.2
+bamboo,golden-grass,42.5,splint-braiding,TR,296.6,7.9,1899,83.4
+bamboo,golden-grass,54.4,mat-plaiting,MP,240.0,2.1,799,75.3
+bamboo,cane,36.5,mat-plaiting,OD,409.5,8.1,2199,84.5
+bamboo,golden-grass,82.7,mat-plaiting,KL,363.2,7.4,1999,82.9
+bamboo,cane,51.7,mat-plaiting,TR,338.5,7.4,1899,76.8
+bamboo,raw-bamboo,81.4,basket-weaving,OD,94.0,2.1,549,74.7
+bamboo,raw-bamboo,29.3,mat-plaiting,MP,250.7,6.3,1499,79.6
+bamboo,cane,29.5,lattice-bending,OD,180.0,6.6,1499,81.3
+bamboo,treated-bamboo,78.8,lattice-bending,WB,186.9,4.5,1199,88.9
+bamboo,treated-bamboo,82.0,mat-plaiting,TR,161.6,4.1,1099,94.2
+bamboo,treated-bamboo,29.5,splint-braiding,MP,332.0,4.2,1299,75.8
+bamboo,treated-bamboo,55.1,splint-braiding,AS,267.3,8.3,1899,77.2
+bamboo,treated-bamboo,17.9,lattice-bending,KL,432.1,2.6,1299,93.6
+bamboo,treated-bamboo,29.1,mat-plaiting,TR,265.4,8.5,1899,86.6
+bamboo,raw-bamboo,66.9,basket-weaving,OD,145.7,2.4,699,93.1
+bamboo,raw-bamboo,22.0,lattice-bending,AS,182.1,5.3,1199,86.1
+bamboo,raw-bamboo,83.5,basket-weaving,OD,113.2,6.6,1399,92.3
+bamboo,reed-grass,29.0,mat-plaiting,MP,435.6,4.2,1499,85.0
+bamboo,cane,66.7,lattice-bending,OD,390.1,2.3,1199,93.6
+bamboo,reed-grass,84.8,lattice-bending,AS,208.8,5.5,1399,94.0
+bamboo,treated-bamboo,35.9,basket-weaving,AS,291.1,8.5,1899,75.4
+bamboo,reed-grass,74.6,mat-plaiting,TR,237.2,3.3,999,68.5
+bamboo,raw-bamboo,33.0,mat-plaiting,MP,124.5,7.2,1499,89.5
+bamboo,golden-grass,57.8,lattice-bending,TR,305.5,4.8,1399,78.3
+bamboo,treated-bamboo,61.8,basket-weaving,WB,123.9,3.0,749,75.0
+bamboo,raw-bamboo,41.9,basket-weaving,KL,228.7,3.9,1099,75.2
+bamboo,golden-grass,60.8,basket-weaving,KL,327.1,2.4,999,68.7
+bamboo,treated-bamboo,63.0,lattice-bending,WB,419.2,8.2,2199,88.9
+bamboo,cane,58.0,splint-braiding,KL,137.7,2.9,749,69.7
+bamboo,golden-grass,64.1,splint-braiding,WB,415.1,7.3,2199,89.9
+bamboo,raw-bamboo,67.8,lattice-bending,MP,399.3,2.6,1199,78.8
+bamboo,treated-bamboo,22.9,basket-weaving,OD,381.5,8.3,1999,71.3
+bamboo,golden-grass,38.0,lattice-bending,TR,258.1,2.8,899,71.4
+bamboo,golden-grass,77.9,mat-plaiting,AS,228.2,2.4,799,69.1
+bamboo,reed-grass,19.0,mat-plaiting,OD,235.0,7.6,1699,87.4
+bamboo,reed-grass,15.2,splint-braiding,KA,137.2,2.5,649,78.1
+bamboo,cane,84.0,basket-weaving,AS,238.8,4.0,1099,70.6
+bamboo,raw-bamboo,84.5,mat-plaiting,KL,203.0,8.1,1899,93.1
+bamboo,reed-grass,82.5,basket-weaving,MP,399.8,2.9,1299,91.7
+bamboo,cane,42.5,lattice-bending,OD,100.9,8.9,1699,90.9
+bamboo,cane,62.1,splint-braiding,WB,267.8,5.7,1499,90.5
+bamboo,raw-bamboo,25.9,mat-plaiting,KL,125.4,8.1,1599,88.7
+bamboo,cane,68.6,mat-plaiting,OD,403.5,2.1,1099,71.4
+bamboo,cane,56.8,basket-weaving,WB,331.3,2.3,999,88.0
+bamboo,reed-grass,52.8,mat-plaiting,TR,351.8,7.4,1899,69.3
+bamboo,treated-bamboo,79.1,lattice-bending,KA,280.4,6.0,1599,88.9
+bamboo,treated-bamboo,76.3,lattice-bending,KL,444.3,5.6,1799,77.8
+bamboo,treated-bamboo,81.4,basket-weaving,OD,401.9,8.4,2199,84.4
+bamboo,reed-grass,83.1,mat-plaiting,AS,426.6,6.7,1999,89.4
+bamboo,treated-bamboo,25.4,mat-plaiting,WB,200.6,7.3,1599,79.7
+bamboo,raw-bamboo,64.5,splint-braiding,KA,372.3,8.4,2199,82.4
+bamboo,reed-grass,32.0,lattice-bending,WB,131.3,6.5,1399,93.6
+bamboo,treated-bamboo,65.7,basket-weaving,OD,126.2,3.9,899,85.9
+bamboo,golden-grass,20.1,basket-weaving,KA,371.9,6.1,1699,85.8
+bamboo,raw-bamboo,75.9,mat-plaiting,TR,183.2,8.7,1799,65.5

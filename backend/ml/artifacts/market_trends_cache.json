@@ -1,0 +1,70 @@
+{
+  "pottery:terracotta": {
+    "category": "pottery",
+    "material": "terracotta",
+    "price_range": {
+      "min": 499,
+      "max": 1999,
+      "median": 1299
+    },
+    "comparables_count": 64,
+    "source_links": [],
+    "date_fetched": "2026-10-10",
+    "evidence_level": "dataset_benchmarked",
+    "label": "Market benchmarked",
+    "status_text": "Market benchmarked",
+    "timestamp": 1791643876.2282777,
+    "cached": false
+  },
+  "extraterrestrial-crystal-art:stardust-meteorite": {
+    "category": "extraterrestrial-crystal-art",
+    "material": "stardust-meteorite",
+    "price_range": {
+      "min": 299,
+      "max": 1499,
+      "median": 649
+    },
+    "comparables_count": 0,
+    "source_links": [],
+    "date_fetched": "2026-10-10",
+    "evidence_level": "thin",
+    "label": "Estimate",
+    "status_text": "Estimate based on your costs only",
+    "timestamp": 1791643882.5315988,
+    "cached": false
+  },
+  "rare-unrecorded-tribal-craft:uncommon-grass": {
+    "category": "rare-unrecorded-tribal-craft",
+    "material": "uncommon-grass",
+    "price_range": {
+      "min": 299,
+      "max": 1499,
+      "median": 649
+    },
+    "comparables_count": 0,
+    "source_links": [],
+    "date_fetched": "2026-10-10",
+    "evidence_level": "thin",
+    "label": "Estimate",
+    "status_text": "Estimate based on your costs only",
+    "timestamp": 1791643891.4524262,
+    "cached": false
+  },
+  "pottery:clay": {
+    "category": "pottery",
+    "material": "clay",
+    "price_range": {
+      "min": 499,
+      "max": 1999,
+      "median": 1299
+    },
+    "comparables_count": 64,
+    "source_links": [],
+    "date_fetched": "2026-10-11",
+    "evidence_level": "dataset_benchmarked",
+    "label": "Market benchmarked",
+    "status_text": "Market benchmarked",
+    "timestamp": 1791698894.0104144,
+    "cached": false
+  }
+}

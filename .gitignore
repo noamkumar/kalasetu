@@ -1,0 +1,78 @@
+# Environment variables & secrets
+.env
+*.env
+!.env.example
+!*.env.example
+backend/.env
+key.properties
+*/key.properties
+*.jks
+*.keystore
+
+# Credentials and service account files
+*credentials*.json
+*service-account*.json
+*service_account*.json
+client_secret*.json
+
+# Python artifacts & Virtual Environments
+.venv/
+.venv*/
+venv/
+venv*/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*/build/
+*.egg-info/
+
+# Database & SQLite files
+*.db
+*.sqlite
+*.sqlite*
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Uploads & local storage
+uploads/
+backend/uploads/
+*/uploads/
+backend/tmp/
+
+# Flutter / Dart / Web artifacts
+.dart_tool/
+*/.dart_tool/
+frontend/.dart_tool/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/.packages
+frontend/build/
+frontend/.pub-cache/
+frontend/.pub/
+node_modules/
+*/node_modules/
+*.lock.bak
+*.apk
+*.aab
+
+# Logs
+*.log
+*/logs/
+
+# IDE & OS
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

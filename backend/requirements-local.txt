@@ -1,0 +1,6 @@
+# KalaSetu - Optional Local Processing Requirements
+# Only required when ENABLE_LOCAL_FALLBACK=true for on-device CPU image cutout & enhancement
+-r requirements.txt
+opencv-python-headless==4.9.0.80
+rembg==2.0.80
+onnxruntime==1.17.0

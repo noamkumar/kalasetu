@@ -1,0 +1,71 @@
+[
+  {
+    "id": "1_terracotta_pot",
+    "name": "Handmade Terracotta Clay Pot",
+    "canvas_style": "white",
+    "status": "done",
+    "quality_score": 80.2,
+    "metrics": {
+      "sharpness": 98.0,
+      "exposure": 90.3,
+      "subject_size": 37.8
+    },
+    "tips": [
+      "Move the camera closer to fill the frame with your handmade item."
+    ],
+    "before_file": "1_terracotta_pot_before.jpg",
+    "after_hero_file": "1_terracotta_pot_after_hero_2000.webp",
+    "after_social_file": "1_terracotta_pot_after_social_1080x1350.webp",
+    "after_thumb_file": "1_terracotta_pot_after_thumb_600.webp",
+    "raw_size_kb": 779.6,
+    "hero_size_kb": 303.7,
+    "social_size_kb": 153.6,
+    "thumb_size_kb": 57.3
+  },
+  {
+    "id": "2_wood_elephant",
+    "name": "Jali Carved Wooden Elephant",
+    "canvas_style": "linen",
+    "status": "done",
+    "quality_score": 76.3,
+    "metrics": {
+      "sharpness": 98.0,
+      "exposure": 85.6,
+      "subject_size": 28.6
+    },
+    "tips": [
+      "Move the camera closer to fill the frame with your handmade item."
+    ],
+    "before_file": "2_wood_elephant_before.jpg",
+    "after_hero_file": "2_wood_elephant_after_hero_2000.webp",
+    "after_social_file": "2_wood_elephant_after_social_1080x1350.webp",
+    "after_thumb_file": "2_wood_elephant_after_thumb_600.webp",
+    "raw_size_kb": 858.6,
+    "hero_size_kb": 246.4,
+    "social_size_kb": 117.9,
+    "thumb_size_kb": 43.6
+  },
+  {
+    "id": "3_brass_diya",
+    "name": "Peacock Brass Diya Lamp",
+    "canvas_style": "linen",
+    "status": "done",
+    "quality_score": 81.5,
+    "metrics": {
+      "sharpness": 98.0,
+      "exposure": 89.4,
+      "subject_size": 44.1
+    },
+    "tips": [
+      "Move the camera closer to fill the frame with your handmade item."
+    ],
+    "before_file": "3_brass_diya_before.jpg",
+    "after_hero_file": "3_brass_diya_after_hero_2000.webp",
+    "after_social_file": "3_brass_diya_after_social_1080x1350.webp",
+    "after_thumb_file": "3_brass_diya_after_thumb_600.webp",
+    "raw_size_kb": 860.1,
+    "hero_size_kb": 263.0,
+    "social_size_kb": 123.7,
+    "thumb_size_kb": 43.9
+  }
+]

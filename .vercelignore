@@ -1,0 +1,23 @@
+# KalaSetu Vercel Deployment Ignore Rules
+# Ignore non-frontend code and tooling
+backend/
+docs/
+scripts/
+.git/
+.github/
+.pytest_cache/
+.venv/
+.idea/
+.vscode/
+
+# Ignore non-web frontend source and build directories
+frontend/android/
+frontend/ios/
+frontend/linux/
+frontend/macos/
+frontend/windows/
+frontend/test/
+frontend/.dart_tool/
+frontend/.pub/
+frontend/.pub-cache/
+frontend/build/app/

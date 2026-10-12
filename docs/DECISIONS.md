@@ -768,3 +768,18 @@ This log documents all architectural choices, assumptions, trade-offs, and defau
   1. Root-Level CLI Execution: Removed `working-directory: frontend/build/web` and invoked `vercel deploy frontend/build/web --prod --yes` from the workspace root.
   2. Multi-Directory Linkage: Mirrored `.vercel/project.json` across repository root, `frontend/.vercel`, and `frontend/build/web/.vercel`.
   3. Symlink & Verification Guards: Added build output verification step ensuring `index.html` exists, along with bundle-level compatibility symlink for nested root directory resolutions.
+
+---
+
+## Decision 039: Canonical Repository-Root Vercel Deployment & Resolution of Root Directory Path Conflict
+- **Date**: 2026-10-12
+- **Status**: Accepted
+- **Context**: Resolved GitHub Actions error where Vercel CLI threw `The provided path "~/work/kalasetu/kalasetu/frontend/build/web/frontend" is a file, but expected a directory` due to a compatibility symlink combined with Vercel project `rootDirectory` ("frontend").
+- **Architectural Implementation**:
+  1. Removal of Workaround Symlink: Removed `ln -sf . frontend/build/web/frontend`, which was treated as a non-directory file by Vercel CLI's `lstat()` directory validator.
+  2. Single Canonical Linkage: Consolidated `.vercel/project.json` into a single canonical repository-root configuration (`.vercel/project.json`), removing duplicate configurations across subdirectories.
+  3. Repository-Root Invocation without Subpath: Replaced `vercel deploy frontend/build/web` with `vercel deploy --prod --yes` executed from the repository root. When run from the root, Vercel CLI resolves `project.rootDirectory` ("frontend") to `repo_root/frontend` without double-appending `frontend`.
+  4. Bundle Parity & Deployed Root Alignment: Populated the `frontend/` directory with the compiled web bundle (`frontend/build/web/*`), guaranteeing that `frontend/index.html` and `frontend/vercel.json` exist at the deployed root, while preserving `frontend/build/web/` for output directory compatibility.
+  5. Isolated Deployment via `.vercelignore`: Configured root and frontend `.vercelignore` files to cleanly ignore backend, tooling, and mobile directories (`android/`, `ios/`, etc.) so only web assets are bundled.
+  6. CI Project Settings Inspection: Added a pre-deployment REST API query step in `.github/workflows/deploy-web.yml` to inspect and log remote Vercel project settings (`rootDirectory`, `framework`, `buildCommand`, `outputDirectory`).
+

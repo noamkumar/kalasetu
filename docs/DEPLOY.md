@@ -137,9 +137,9 @@ The workflow (`.github/workflows/deploy-web.yml`):
    flutter build web --release --no-tree-shake-icons --dart-define=API_BASE_URL=https://kalasetu-backend-s3uq.onrender.com/api/v1
    ```
 5. Bundles `frontend/vercel.json` (SPA rewrite rule `/*` -> `/index.html` and HTTPS `Permissions-Policy` headers) with the compiled assets in `frontend/build/web/`.
-6. Deploys to Vercel production using:
+6. Deploys to Vercel production from repository root using:
    ```bash
-   vercel deploy frontend/build/web --prod --yes --token="$VERCEL_TOKEN"
+   vercel deploy --prod --yes --token="$VERCEL_TOKEN"
    ```
 
 ### 5.3 Triggering the Deployment

@@ -8,6 +8,7 @@ on:
       - 'frontend/**'
       - '.github/workflows/deploy-web.yml'
       - 'vercel.json'
+      - '.vercelignore'
   workflow_dispatch:
     inputs:
       api_base_url:
@@ -74,29 +75,73 @@ jobs:
           echo "Verified frontend/build/web contains index.html"
           ls -la frontend/build/web
 
+      - name: Inspect Vercel Project Settings
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          node -e "
+            const https = require('https');
+            const orgId = process.env.VERCEL_ORG_ID || '';
+            const projectId = process.env.VERCEL_PROJECT_ID || '';
+            const token = process.env.VERCEL_TOKEN || '';
+            const teamQuery = orgId.startsWith('team_') ? '?teamId=' + orgId : '';
+            const options = {
+              hostname: 'api.vercel.com',
+              path: '/v9/projects/' + projectId + teamQuery,
+              headers: { Authorization: 'Bearer ' + token }
+            };
+            https.get(options, res => {
+              let body = '';
+              res.on('data', chunk => body += chunk);
+              res.on('end', () => {
+                if (res.statusCode >= 200 && res.statusCode < 300) {
+                  const data = JSON.parse(body);
+                  console.log('=== Vercel Remote Project Settings ===');
+                  console.log('Project Name:    ', data.name);
+                  console.log('Project ID:      ', data.id);
+                  console.log('Root Directory:  ', JSON.stringify(data.rootDirectory));
+                  console.log('Framework:       ', JSON.stringify(data.framework));
+                  console.log('Build Command:   ', JSON.stringify(data.buildCommand));
+                  console.log('Output Directory:', JSON.stringify(data.outputDirectory));
+                  console.log('======================================');
+                } else {
+                  console.log('Vercel project inspection HTTP status: ' + res.statusCode);
+                }
+              });
+            }).on('error', err => console.log('Inspection request notice:', err.message));
+          "
+
       - name: Prepare Vercel Static Bundle
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          # Copy vercel.json into the web build directory for SPA rewrites and security headers
+          # Copy vercel.json into the web build directory
           cp frontend/vercel.json frontend/build/web/vercel.json
 
-          # Write Vercel project linkage to target existing project across all potential lookup roots
+          # Populate frontend root with build artifacts for Vercel rootDirectory 'frontend' resolution
+          cp -r frontend/build/web/* frontend/
+
+          # Verify deployed root contains index.html and vercel.json
+          if [ ! -f "frontend/index.html" ] || [ ! -f "frontend/vercel.json" ]; then
+            echo "::error::frontend root missing index.html or vercel.json"
+            exit 1
+          fi
+          echo "Verified frontend contains index.html and vercel.json"
+          ls -la frontend/index.html frontend/vercel.json
+
+          # Write single canonical Vercel project configuration at repository root
           node -e "
             const fs = require('fs');
             const projectConfig = JSON.stringify({
               orgId: process.env.VERCEL_ORG_ID || '',
               projectId: process.env.VERCEL_PROJECT_ID || ''
             }, null, 2);
-            for (const dir of ['.vercel', 'frontend/.vercel', 'frontend/build/web/.vercel']) {
-              fs.mkdirSync(dir, { recursive: true });
-              fs.writeFileSync(dir + '/project.json', projectConfig);
-            }
+            fs.mkdirSync('.vercel', { recursive: true });
+            fs.writeFileSync('.vercel/project.json', projectConfig);
           "
-
-          # Fallback link to handle Vercel CLI rootDirectory 'frontend' resolution inside bundle
-          ln -sf . frontend/build/web/frontend || true
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
@@ -107,4 +152,4 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          vercel deploy frontend/build/web --prod --yes --token="${{ secrets.VERCEL_TOKEN }}"
+          vercel deploy --prod --yes --token="${{ secrets.VERCEL_TOKEN }}"

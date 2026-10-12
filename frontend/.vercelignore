@@ -1,0 +1,12 @@
+# KalaSetu Frontend Vercel Ignore Rules
+# Exclude non-web Flutter platforms and tooling
+android/
+ios/
+linux/
+macos/
+windows/
+test/
+.dart_tool/
+.pub/
+.pub-cache/
+build/app/

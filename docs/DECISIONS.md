@@ -816,5 +816,93 @@ This log documents all architectural choices, assumptions, trade-offs, and defau
   6. OTP Error Title Discrimination: `NetworkErrorHelper.resolve` maps OTP-related errors to `check_otp_title` ("Enter Verification Code").
   7. Automated Tests: Added `backend/tests/test_auth_verification.py` (7 tests) and `frontend/test/auth_otp_flow_test.dart` (7 tests) covering demo accounts, dynamic OTP, wrong OTP rejection, expiration, and UI state.
 
+---
+
+## Decision 042: Live Backend OTP Verification Investigation & Diagnostic Hardening
+- **Date**: 2026-10-12
+- **Status**: Accepted
+- **Context**: User reported that after commit `0b09f81`, the screen still showed "Invalid or expired OTP code" when entering `123456`.
+- **Investigation & Evidence**:
+  1. Screen & API Mapping: Identified screen `AuthOtpScreen` (`RouteNames.authOtp`), invoking `_authRepo.verifyOtp(widget.phone, otp)` upon entering 6 digits or tapping `verify_btn`, targeting HTTP POST `/api/v1/auth/otp/verify`.
+  2. Live Render Backend Status: Probed live Render deployment (`https://kalasetu-backend-s3uq.onrender.com`). Verified `/health` returned 200 OK. Tested live `/api/v1/auth/otp/send` with `"9876543210"` which returned `{"message": "OTP sent successfully", "debug_otp": "123456"}` (confirming commit `0b09f81` was already deployed live). Tested live verify with `123456` which returned HTTP 200 OK with valid JWT tokens.
+  3. Live Integration Test (`scripts/test_live_backend_auth.py`): Executed real HTTP calls against live Render. Verified all 5 documented demo accounts (`9876543210`, `9876543211`, `9876543212`, `9876543220`, `9876543221`) and `+91` variants succeed with HTTP 200 and return profile Rameshwar Prajapati with normalized `+919876543210`. Verified security guard correctly rejects non-demo phones with HTTP 400 (`Invalid or expired OTP code`).
+  4. Root Cause for Observed Persistence:
+     - The previous session never rebuilt or pushed a release APK after committing `0b09f81`; the user's phone was still running an earlier APK build or had a cached stale local server address stored in Hive (`server_base_url`) from previous dev runs.
+     - `ApiClient.defaultBaseUrl` defaulted to `http://10.0.2.2:8000` (emulator-only loopback), which failed on real devices if `--dart-define` was omitted.
+     - Unencoded query parameter string interpolation in `auth_phone_screen.dart` (`?phone=$phone`) caused `+` characters in phone numbers to be decoded as spaces (`%20`) by GoRouter.
+     - Backend had no diagnostic logs in `verify_otp`, making live server troubleshooting opaque.
+- **Architectural Implementation**:
+  1. Safe Diagnostic Logging: Added structured logging in `backend/app/routers/auth.py` (`[AUTH OTP SEND]` and `[AUTH OTP VERIFY]`) and `frontend/lib/data/repositories/auth_repository.dart` (`[AUTH SEND]` and `[AUTH VERIFY]`). Logs phone normalization state, active base URL, and demo detection without ever logging OTPs, tokens, or secrets.
+  2. Release Base URL Fallback (`frontend/lib/data/api/api_client.dart`): In `kReleaseMode`, `ApiClient.defaultBaseUrl` now defaults to production Render (`https://kalasetu-backend-s3uq.onrender.com/api/v1`), preventing fallback to `10.0.2.2`.
+  3. Developer Settings Presets (`developer_settings_dialog.dart`): Added a dedicated "Render Production" preset chip and updated reset handler to restore production base URL.
+  4. Safe Query Encoding (`auth_phone_screen.dart`): Used `Uri(path: RouteNames.authOtp, queryParameters: {...})` to prevent `+` prefix stripping during route navigation.
+  5. Commit Expiry & Identification (`main.py`): Exposed `git_commit` in `/health` from `RENDER_GIT_COMMIT`.
+  6. Signed Release APK Compilation: Recompiled fresh signed release APK `KalaSetu-release.apk` (70.64 MB, SHA256: `6811153F188CD083ADA6F6F50963E191E2836852F683F20EC11A73F65CC7E12F`).
+
+---
+
+## Decision 043: Authentication Request Visibility & Safe Diagnostic Instrumentation
+- **Date**: 2026-10-12
+- **Status**: Accepted
+- **Context**: APK phone OTP login failed with "Invalid or expired OTP code", but no authentication requests appeared in the deployed Render backend application logs.
+- **Root Cause Analysis & Forensic Evidence**:
+  1. **Request Execution & Path**:
+     - The error message `"Invalid or expired OTP code"` does not exist anywhere in Flutter frontend or translation assets. It is exclusively defined and returned by FastAPI at `backend/app/routers/auth.py:63` (`HTTP 400 Bad Request`).
+     - This proves conclusively that the friend's APK successfully connected to the backend over the network; the request did NOT fail at DNS/TLS or socket level. If network failure occurred, `NetworkErrorHelper.resolve` would have displayed "Server unreachable" or "No internet".
+  2. **Render Application Log Invisibility**:
+     - Python's standard logging root logger defaults to `WARNING` (level 30) when unconfigured. No `logging.basicConfig(level=logging.INFO)` was previously invoked in `backend/app/main.py`.
+     - Loggers named `kalasetu.auth` had level `NOTSET` and delegated to the root logger, silently suppressing all `logger.info(...)` statements (`[AUTH OTP SEND]`, `[AUTH OTP VERIFY]`, `[AUTH OTP VERIFY ACCEPTED]`, `[OTP SERVICE]`).
+     - Furthermore, FastAPI had no request logging middleware. In standard Uvicorn output, only raw access logs (without request IDs, duration, or auth context) were emitted, giving the impression that no login requests occurred.
+  3. **Verification Failure Reason**:
+     - Against the live Render deployment (`https://kalasetu-backend-s3uq.onrender.com`), all 5 documented demo accounts (`9876543210` to `9876543221`) with demo code `123456` verified successfully with HTTP 200 OK.
+     - Entering a non-demo phone number with code `123456` or entering an incorrect OTP is rejected by design with HTTP 400 (`Invalid or expired OTP code`).
+- **Architectural Implementation**:
+  1. **Safe Startup Diagnostic** (`frontend/lib/main.dart`):
+     - Logs selected API host, port, whether the URL is configured, and configuration origin (custom stored, compile-time `--dart-define`, or default release fallback) without logging credentials or secrets.
+  2. **Complete Request Lifecycle Instrumentation** (`frontend/lib/data/api/api_client.dart`):
+     - Logs HTTP request start time, endpoint path, host, completion time, duration in ms, and response status code.
+     - Specifically flags whether failures occurred before reaching the server (e.g. `SocketException`, `TimeoutException`, `ClientException`) or post-server.
+     - Preserves network exception rethrowing to prevent silent swallowing.
+  3. **User Action & Phone Privacy Guard** (`auth_phone_screen.dart`, `auth_otp_screen.dart`, `auth_repository.dart`):
+     - Logs user action when initiating Send OTP and Verify OTP.
+     - Introduces `maskPhone` utility (`+91******3210`) ensuring no full phone numbers or OTP values are ever recorded in developer logs or console output.
+  4. **Backend Request Logging & Logger Root Setup** (`backend/app/main.py`):
+     - Configured `logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] [%(name)s] %(message)s")`.
+     - Attached `RequestLoggingMiddleware` to capture all inbound and outbound requests, status codes, latency, and request IDs in Render application logs.
+     - Masked phone logging in `backend/app/routers/auth.py` and `backend/app/services/auth_service.py`.
+
+---
+
+## Decision 044: Universal Demo OTP Authentication for Any Valid Indian Mobile Number
+- **Date**: 2026-10-12
+- **Status**: Accepted
+- **Context**: Rather than restricting login to the five pre-seeded demo accounts (`9876543210` to `9876543221`), the user requested that any valid 10-digit Indian mobile number (`^[6-9]\d{9}$`) be able to register or log in using demo OTP `123456` without requiring real SMS delivery, SMS provider contracts, or third-party SMS API credentials.
+- **Architectural Implementation**:
+  1. **Configurable Demo Authentication Mode (`ENABLE_UNIVERSAL_DEMO_OTP` & `DEMO_MODE`)**:
+     - Added `ENABLE_UNIVERSAL_DEMO_OTP: bool = True` and `DEMO_MODE: bool = False` to `app/config.py`.
+     - `is_demo_mode_active()` returns `True` when `ENABLE_UNIVERSAL_DEMO_OTP=true`, `DEMO_MODE=true`, or `APP_ENV="development"`.
+     - Documented in `backend/.env.example` that universal demo OTP is intended for demonstrations and development, and does not verify real phone ownership via SMS.
+     - In strict production mode without demo mode (`ENABLE_UNIVERSAL_DEMO_OTP=false`, `DEMO_MODE=false`), universal demo OTP is rejected for non-demo numbers, while preserving the five documented demo accounts.
+  2. **Indian Mobile Validation & E.164 Normalization (`validate_and_normalize_phone`)**:
+     - Strict format validation in backend `auth_service.py` and frontend `AuthRepository.isValidIndianMobile`.
+     - Validates Indian mobile numbers are exactly 10 digits starting with 6, 7, 8, or 9 (`^[6-9]\d{9}$`).
+     - Normalizes consistently to E.164 `+91XXXXXXXXXX` format.
+     - Rejects letters, malformed numbers, and invalid lengths with clear validation messages (`phone_invalid_indian`, `phone_invalid`).
+  3. **Duplicate Account Prevention & Session Issuance**:
+     - Lookups search by normalized `norm`, raw `phone`, or `raw_10`.
+     - If an existing account has legacy unnormalized formatting, automatically updates `artisan.phone = norm` on login.
+     - Normal access and refresh JWT tokens are generated only after OTP verification succeeds.
+  4. **Frontend UI & Multilingual Copy**:
+     - `AuthPhoneScreen`: Validates 10-digit Indian mobile format with `+91` prefix visible.
+     - `AuthOtpScreen`: Displays accurate demo banner (`"Demo mode: Enter 123456 to continue"`) when demo mode is active.
+     - Added one-tap "Resend OTP" text button in `AuthOtpScreen`.
+     - Added `phone_invalid_indian` and updated `debug_otp_hint` across all 7 translation files (`en`, `hi`, `ta`, `te`, `kn`, `ml`, `bn`), verified with 100% key parity.
+  5. **Automated Test Coverage**:
+     - Backend: `backend/tests/test_auth_verification.py` (12 tests) covering valid/invalid numbers, multiple different numbers logging in with 123456, duplicate-account prevention, wrong OTP rejection, and strict production safeguards. All 72 backend tests passing.
+     - Frontend: `frontend/test/auth_otp_flow_test.dart` (9 tests) covering validation, normalization, and widget rendering. All 158 flutter tests passing with 0 issues in `flutter analyze`.
+
+
+
+
 
 

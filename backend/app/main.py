@@ -16,6 +16,17 @@ from app.routers import (
     assistant, analytics, voice, marketplace, notifications
 )
 
+import logging
+import time
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] [%(name)s] %(message)s",
+)
+logger = logging.getLogger("kalasetu")
+logger.setLevel(logging.INFO)
+logging.getLogger("kalasetu.auth").setLevel(logging.INFO)
+
 settings = get_settings()
 
 def get_allowed_origins() -> list[str]:
@@ -50,7 +61,6 @@ async def lifespan(app: FastAPI):
             try:
                 seed_demo_data(db)
             except Exception as e:
-                import logging
                 logging.getLogger("kalasetu").warning(f"Demo seeding failed on startup: {e}")
 
     yield
@@ -64,16 +74,32 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Request ID Middleware
-class RequestIdMiddleware(BaseHTTPMiddleware):
+# Request ID & Access Logging Middleware
+class RequestLoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         req_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
         request.state.request_id = req_id
-        response = await call_next(request)
-        response.headers["X-Request-ID"] = req_id
-        return response
+        start_time = time.time()
+        path = request.url.path
+        method = request.method
 
-app.add_middleware(RequestIdMiddleware)
+        logger.info(f"[HTTP INBOUND] {method} {path} | req_id={req_id}")
+        try:
+            response = await call_next(request)
+            duration_ms = round((time.time() - start_time) * 1000, 1)
+            response.headers["X-Request-ID"] = req_id
+            logger.info(
+                f"[HTTP OUTBOUND] {method} {path} -> {response.status_code} ({duration_ms}ms) | req_id={req_id}"
+            )
+            return response
+        except Exception as exc:
+            duration_ms = round((time.time() - start_time) * 1000, 1)
+            logger.error(
+                f"[HTTP ERROR] {method} {path} -> {type(exc).__name__} ({duration_ms}ms) | req_id={req_id}"
+            )
+            raise
+
+app.add_middleware(RequestLoggingMiddleware)
 
 # CORS Middleware from ALLOWED_ORIGINS
 app.add_middleware(
@@ -149,5 +175,7 @@ async def health_check(request: Request):
         "storage_backend": settings.STORAGE_BACKEND,
         "key_configured": key_configured,
         "gemini_key_configured": key_configured,
+        "git_commit": os.environ.get("RENDER_GIT_COMMIT", os.environ.get("GIT_COMMIT", "local")),
         "request_id": req_id
     }
+

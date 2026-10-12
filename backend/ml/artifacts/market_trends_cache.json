@@ -9,11 +9,11 @@
     },
     "comparables_count": 64,
     "source_links": [],
-    "date_fetched": "2026-10-10",
+    "date_fetched": "2026-10-12",
     "evidence_level": "dataset_benchmarked",
     "label": "Market benchmarked",
     "status_text": "Market benchmarked",
-    "timestamp": 1791643876.2282777,
+    "timestamp": 1791812135.3221495,
     "cached": false
   },
   "extraterrestrial-crystal-art:stardust-meteorite": {
@@ -26,11 +26,11 @@
     },
     "comparables_count": 0,
     "source_links": [],
-    "date_fetched": "2026-10-10",
+    "date_fetched": "2026-10-12",
     "evidence_level": "thin",
     "label": "Estimate",
     "status_text": "Estimate based on your costs only",
-    "timestamp": 1791643882.5315988,
+    "timestamp": 1791812135.331717,
     "cached": false
   },
   "rare-unrecorded-tribal-craft:uncommon-grass": {
@@ -43,11 +43,11 @@
     },
     "comparables_count": 0,
     "source_links": [],
-    "date_fetched": "2026-10-10",
+    "date_fetched": "2026-10-12",
     "evidence_level": "thin",
     "label": "Estimate",
     "status_text": "Estimate based on your costs only",
-    "timestamp": 1791643891.4524262,
+    "timestamp": 1791812135.3546703,
     "cached": false
   },
   "pottery:clay": {

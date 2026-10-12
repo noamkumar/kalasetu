@@ -21,10 +21,13 @@ class Settings(BaseSettings):
     STT_PROVIDER: str = "gemini"
     IMAGE_EDIT_PROVIDER: str = "local"
     ENABLE_LOCAL_FALLBACK: bool = False
-    OTP_PROVIDER_KEY: str = ""
-    
-    # Demo Mode
+    # Demo & Authentication Mode Configuration
+    # When DEMO_MODE or ENABLE_UNIVERSAL_DEMO_OTP is True (or APP_ENV == "development"),
+    # any valid 10-digit Indian mobile number can log in with demo OTP 123456.
+    # Universal demo OTP verification is intended for demonstrations and development,
+    # and does not verify real phone ownership.
     DEMO_MODE: bool = False
+    ENABLE_UNIVERSAL_DEMO_OTP: bool = True
 
     # Database & Storage
     DATABASE_URL: str = "sqlite:///./kalasetu.db"

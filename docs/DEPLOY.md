@@ -139,7 +139,7 @@ The workflow (`.github/workflows/deploy-web.yml`):
 5. Bundles `frontend/vercel.json` (SPA rewrite rule `/*` -> `/index.html` and HTTPS `Permissions-Policy` headers) with the compiled assets in `frontend/build/web/`.
 6. Deploys to Vercel production using:
    ```bash
-   vercel deploy --prod --yes --token="$VERCEL_TOKEN"
+   vercel deploy frontend/build/web --prod --yes --token="$VERCEL_TOKEN"
    ```
 
 ### 5.3 Triggering the Deployment

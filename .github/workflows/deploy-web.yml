@@ -65,6 +65,15 @@ jobs:
         run: |
           flutter build web --release --no-tree-shake-icons --dart-define=API_BASE_URL="${{ env.API_BASE_URL }}"
 
+      - name: Verify Web Build Artifacts
+        run: |
+          if [ ! -f "frontend/build/web/index.html" ]; then
+            echo "::error::Flutter web build output not found at frontend/build/web/index.html"
+            exit 1
+          fi
+          echo "Verified frontend/build/web contains index.html"
+          ls -la frontend/build/web
+
       - name: Prepare Vercel Static Bundle
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -72,24 +81,30 @@ jobs:
         run: |
           # Copy vercel.json into the web build directory for SPA rewrites and security headers
           cp frontend/vercel.json frontend/build/web/vercel.json
-          # Write Vercel project linkage to target existing project
+
+          # Write Vercel project linkage to target existing project across all potential lookup roots
           node -e "
             const fs = require('fs');
-            fs.mkdirSync('frontend/build/web/.vercel', { recursive: true });
-            fs.writeFileSync('frontend/build/web/.vercel/project.json', JSON.stringify({
+            const projectConfig = JSON.stringify({
               orgId: process.env.VERCEL_ORG_ID || '',
               projectId: process.env.VERCEL_PROJECT_ID || ''
-            }, null, 2));
+            }, null, 2);
+            for (const dir of ['.vercel', 'frontend/.vercel', 'frontend/build/web/.vercel']) {
+              fs.mkdirSync(dir, { recursive: true });
+              fs.writeFileSync(dir + '/project.json', projectConfig);
+            }
           "
+
+          # Fallback link to handle Vercel CLI rootDirectory 'frontend' resolution inside bundle
+          ln -sf . frontend/build/web/frontend || true
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
       - name: Deploy to Vercel Production
-        working-directory: frontend/build/web
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          vercel deploy --prod --yes --token="${{ secrets.VERCEL_TOKEN }}"
+          vercel deploy frontend/build/web --prod --yes --token="${{ secrets.VERCEL_TOKEN }}"

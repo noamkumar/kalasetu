@@ -757,3 +757,14 @@ This log documents all architectural choices, assumptions, trade-offs, and defau
   2. Vercel Static Bundle: Bundles vercel.json with SPA rewrites (/* -> /index.html) and HTTPS Permissions-Policy headers (camera=*, microphone=*).
   3. Security: Credentials strictly consumed via GitHub Secrets; zero tokens or IDs hardcoded in repository.
   4. Build Script Parity: Updated scripts/build_web.ps1 to default to https://kalasetu-backend-s3uq.onrender.com/api/v1.
+
+---
+
+## Decision 038: Explicit Root-Level Deployment Path for Vercel CLI
+- **Date**: 2026-10-12
+- **Status**: Accepted
+- **Context**: Resolved GitHub Actions failure where Vercel CLI appended project `rootDirectory` ("frontend") to a sub-working directory (`frontend/build/web/frontend`).
+- **Architectural Implementation**:
+  1. Root-Level CLI Execution: Removed `working-directory: frontend/build/web` and invoked `vercel deploy frontend/build/web --prod --yes` from the workspace root.
+  2. Multi-Directory Linkage: Mirrored `.vercel/project.json` across repository root, `frontend/.vercel`, and `frontend/build/web/.vercel`.
+  3. Symlink & Verification Guards: Added build output verification step ensuring `index.html` exists, along with bundle-level compatibility symlink for nested root directory resolutions.

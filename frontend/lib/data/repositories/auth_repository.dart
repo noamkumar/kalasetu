@@ -13,22 +13,39 @@ class AuthRepository {
     '+919876543221', '9876543221',
   };
 
+  static bool isValidIndianMobile(String rawPhone) {
+    final clean = rawPhone.trim().replaceAll(RegExp(r'[\s\-]'), '');
+    String raw10;
+    if (clean.startsWith('+91') && clean.length == 13) {
+      raw10 = clean.substring(3);
+    } else if (clean.startsWith('91') && clean.length == 12) {
+      raw10 = clean.substring(2);
+    } else if (clean.startsWith('0') && clean.length == 11) {
+      raw10 = clean.substring(1);
+    } else if (clean.length == 10) {
+      raw10 = clean;
+    } else {
+      return false;
+    }
+    return RegExp(r'^[6-9]\d{9}$').hasMatch(raw10);
+  }
+
   static String normalizePhone(String rawPhone) {
     final clean = rawPhone.trim().replaceAll(RegExp(r'[\s\-]'), '');
     if (clean.startsWith('+91') && clean.length == 13) {
       return clean;
     }
-    if (clean.startsWith('+')) {
-      return clean;
+    if (clean.startsWith('91') && clean.length == 12) {
+      return '+$clean';
     }
     if (clean.startsWith('0') && clean.length == 11) {
       return '+91${clean.substring(1)}';
     }
-    if (clean.startsWith('91') && clean.length == 12) {
-      return '+$clean';
-    }
     if (clean.length == 10 && RegExp(r'^\d{10}$').hasMatch(clean)) {
       return '+91$clean';
+    }
+    if (clean.startsWith('+')) {
+      return clean;
     }
     return clean;
   }
@@ -55,8 +72,23 @@ class AuthRepository {
     return true;
   }
 
+  static String maskPhone(String phone) {
+    final clean = phone.trim();
+    if (clean.length < 6) return '[REDACTED]';
+    return '${clean.substring(0, 3)}******${clean.substring(clean.length - 4)}';
+  }
+
   Future<String?> sendOtp(String phone, {int maxRetries = 2}) async {
     final normalized = normalizePhone(phone);
+    final isDemo = isDemoPhone(normalized);
+    final maskedPhone = maskPhone(phone);
+    final maskedNorm = maskPhone(normalized);
+    DeveloperLogService.log(
+      '[AUTH SEND] Active Base URL: ${_apiClient.baseUrl} | '
+      'Endpoint: /api/v1/auth/otp/send | '
+      'Phone: $maskedPhone | Normalized: $maskedNorm | '
+      'Client demo detection: $isDemo',
+    );
     int attempt = 0;
     while (true) {
       try {
@@ -66,13 +98,21 @@ class AuthRepository {
           body: {'phone': normalized},
         );
         if (response is Map) {
-          return response['debug_otp']?.toString();
+          final debugOtp = response['debug_otp']?.toString();
+          DeveloperLogService.log(
+            '[AUTH SEND SUCCESS] Phone: $maskedNorm | debug_otp_returned: ${debugOtp != null && debugOtp.isNotEmpty}',
+          );
+          return debugOtp;
         }
         return null;
       } catch (e) {
+        final sanitizedErr = DeveloperLogService.scrubSecrets(e.toString());
+        DeveloperLogService.log(
+          '[AUTH SEND FAILED] Phone: $maskedNorm | Attempt $attempt | Error: $sanitizedErr',
+        );
         if (attempt <= maxRetries && _isTransient(e)) {
           final backoffMs = attempt * 500; // 500ms, then 1000ms
-          DeveloperLogService.log('sendOtp attempt $attempt failed ($e). Retrying in ${backoffMs}ms...');
+          DeveloperLogService.log('sendOtp attempt $attempt failed ($sanitizedErr). Retrying in ${backoffMs}ms...');
           await Future.delayed(Duration(milliseconds: backoffMs));
           continue;
         }
@@ -83,6 +123,15 @@ class AuthRepository {
 
   Future<bool> verifyOtp(String phone, String otp, {int maxRetries = 2}) async {
     final normalized = normalizePhone(phone);
+    final isDemo = isDemoPhone(normalized);
+    final maskedPhone = maskPhone(phone);
+    final maskedNorm = maskPhone(normalized);
+    DeveloperLogService.log(
+      '[AUTH VERIFY] Active Base URL: ${_apiClient.baseUrl} | '
+      'Endpoint: /api/v1/auth/otp/verify | '
+      'Phone: $maskedPhone | Normalized: $maskedNorm | '
+      'Client demo detection: $isDemo',
+    );
     int attempt = 0;
     while (true) {
       try {
@@ -95,6 +144,10 @@ class AuthRepository {
           final token = response['access_token'] as String;
           final refresh = response['refresh_token'] as String;
           final isNewUser = response['is_new_user'] as bool? ?? false;
+
+          DeveloperLogService.log(
+            '[AUTH VERIFY SUCCESS] Phone: $maskedNorm | is_new_user: $isNewUser | token: [REDACTED]',
+          );
 
           await StorageService.saveAuthTokens(
             accessToken: token,
@@ -111,9 +164,13 @@ class AuthRepository {
         }
         throw const ApiException(message: 'Invalid verification response from server');
       } catch (e) {
+        final sanitizedErr = DeveloperLogService.scrubSecrets(e.toString());
+        DeveloperLogService.log(
+          '[AUTH VERIFY FAILED] Phone: $maskedNorm | Attempt $attempt | Error: $sanitizedErr',
+        );
         if (attempt <= maxRetries && _isTransient(e)) {
           final backoffMs = attempt * 500;
-          DeveloperLogService.log('verifyOtp attempt $attempt failed ($e). Retrying in ${backoffMs}ms...');
+          DeveloperLogService.log('verifyOtp attempt $attempt failed ($sanitizedErr). Retrying in ${backoffMs}ms...');
           await Future.delayed(Duration(milliseconds: backoffMs));
           continue;
         }
@@ -121,6 +178,7 @@ class AuthRepository {
       }
     }
   }
+
 
   Future<Map<String, dynamic>> fetchProfile() async {
     final profile = await _apiClient.get('/api/v1/me');

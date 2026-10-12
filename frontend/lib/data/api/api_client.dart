@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../../core/services/developer_log_service.dart';
 import '../../core/services/storage_service.dart';
@@ -39,7 +40,9 @@ class ApiException implements Exception {
 }
 
 class ApiClient {
-  static const String defaultBaseUrl = 'http://10.0.2.2:8000';
+  static const String productionBaseUrl = 'https://kalasetu-backend-s3uq.onrender.com/api/v1';
+  static const String emulatorBaseUrl = 'http://10.0.2.2:8000';
+  static String get defaultBaseUrl => kReleaseMode ? productionBaseUrl : emulatorBaseUrl;
   static const Duration defaultTimeout = Duration(seconds: 25);
   static const Duration uploadTimeout = Duration(seconds: 75);
 
@@ -56,7 +59,7 @@ class ApiClient {
   /// 1. Value manually set at runtime via Settings > Developer (stored in Hive)
   /// 2. Value passed into constructor
   /// 3. Dart define --dart-define=API_BASE_URL=...
-  /// 4. Default Android emulator URL (http://10.0.2.2:8000)
+  /// 4. Default: Render production in release mode, emulator loopback in debug mode
   String get baseUrl {
     // 1. Value manually set at runtime via Settings > Developer (stored in Hive)
     final runtimeStored = StorageService.serverBaseUrl;
@@ -70,17 +73,17 @@ class ApiClient {
     }
     // 3. Compile-time --dart-define=API_BASE_URL=...
     const envUrl = String.fromEnvironment('API_BASE_URL');
-    if (envUrl.isNotEmpty && envUrl != defaultBaseUrl) {
+    if (envUrl.isNotEmpty) {
       return envUrl;
     }
-    // 4. Default Android emulator URL (http://10.0.2.2:8000)
+    // 4. Default fallback
     return defaultBaseUrl;
   }
 
   /// Default server URL based on compile-time --dart-define or fallback
   static String get compileTimeOrPlatformDefaultUrl {
     const envUrl = String.fromEnvironment('API_BASE_URL');
-    if (envUrl.isNotEmpty && envUrl != defaultBaseUrl) {
+    if (envUrl.isNotEmpty) {
       return envUrl;
     }
     return defaultBaseUrl;
@@ -147,12 +150,13 @@ class ApiClient {
       final healthUri = clean.endsWith('/api/v1')
           ? Uri.parse('$clean/health')
           : Uri.parse('$clean/health');
-      final resp = await client.get(healthUri).timeout(const Duration(milliseconds: 3000));
+      final resp = await client.get(healthUri).timeout(const Duration(milliseconds: 5000));
       return resp.statusCode == 200;
     } catch (_) {
       return false;
     }
   }
+
 
   /// Returns the root host and port (e.g., http://192.168.1.10:8000) stripped of any path
   String get rootUrl {
@@ -275,6 +279,10 @@ class ApiClient {
 
   Future<dynamic> post(String path, {dynamic body, Duration? timeout}) async {
     final uri = _buildUri(path);
+    final startTime = DateTime.now();
+    DeveloperLogService.log(
+      '[HTTP REQUEST START] POST ${uri.path} | Host: ${uri.host} | Time: ${startTime.toIso8601String()}',
+    );
     try {
       final response = await _client
           .post(
@@ -283,8 +291,17 @@ class ApiClient {
             body: body != null ? json.encode(body) : null,
           )
           .timeout(timeout ?? defaultTimeout);
+      final durationMs = DateTime.now().difference(startTime).inMilliseconds;
+      DeveloperLogService.log(
+        '[HTTP REQUEST COMPLETED] POST ${uri.path} -> HTTP ${response.statusCode} (${durationMs}ms)',
+      );
       return _processResponse(response, method: 'POST', url: uri.toString());
     } on SocketException catch (e) {
+      final durationMs = DateTime.now().difference(startTime).inMilliseconds;
+      final sanitized = DeveloperLogService.scrubSecrets(e.toString());
+      DeveloperLogService.log(
+        '[HTTP FAILED PRE-SERVER] POST ${uri.path} -> SocketException: Failed before reaching server (${durationMs}ms) | $sanitized',
+      );
       DeveloperLogService.recordError(
         method: 'POST',
         url: uri.toString(),
@@ -300,6 +317,10 @@ class ApiClient {
         errorType: ApiErrorType.serverUnreachable,
       );
     } on TimeoutException catch (e) {
+      final durationMs = DateTime.now().difference(startTime).inMilliseconds;
+      DeveloperLogService.log(
+        '[HTTP FAILED PRE-SERVER] POST ${uri.path} -> TimeoutException: Timed out after ${durationMs}ms',
+      );
       DeveloperLogService.recordError(
         method: 'POST',
         url: uri.toString(),
@@ -316,6 +337,10 @@ class ApiClient {
         errorType: ApiErrorType.serverUnreachable,
       );
     } on http.ClientException catch (e) {
+      final durationMs = DateTime.now().difference(startTime).inMilliseconds;
+      DeveloperLogService.log(
+        '[HTTP FAILED PRE-SERVER] POST ${uri.path} -> ClientException: ${e.message} (${durationMs}ms)',
+      );
       DeveloperLogService.recordError(
         method: 'POST',
         url: uri.toString(),
@@ -331,6 +356,11 @@ class ApiClient {
         errorType: ApiErrorType.serverUnreachable,
       );
     } catch (e) {
+      final durationMs = DateTime.now().difference(startTime).inMilliseconds;
+      final sanitized = DeveloperLogService.scrubSecrets(e.toString());
+      DeveloperLogService.log(
+        '[HTTP FAILED] POST ${uri.path} -> Error (${durationMs}ms): $sanitized',
+      );
       if (e is ApiException) rethrow;
       throw ApiException(message: 'Request failed: $e', method: 'POST', url: uri.toString());
     }
@@ -574,11 +604,19 @@ class ApiClient {
     String method = 'GET',
     String? url,
   }) {
+    final sanitizedBody = DeveloperLogService.scrubSecrets(response.body);
     if (response.statusCode >= 200 && response.statusCode < 300) {
+      DeveloperLogService.log(
+        '[API CLIENT] $method ${url ?? ""} -> HTTP ${response.statusCode}',
+      );
       if (response.body.isEmpty) return null;
       return json.decode(response.body);
     } else {
+      DeveloperLogService.log(
+        '[API CLIENT ERROR] $method ${url ?? ""} -> HTTP ${response.statusCode} | Body: $sanitizedBody',
+      );
       String errMsg = 'Server error (${response.statusCode})';
+
       int? aiHttpStatus;
       String? aiGeminiStatus;
       String? aiModel;

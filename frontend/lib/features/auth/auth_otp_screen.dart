@@ -11,6 +11,7 @@ import '../../core/widgets/app_button.dart';
 import '../../core/widgets/big_numeric_keypad.dart';
 import '../../core/utils/network_error_helper.dart';
 import '../../core/widgets/speaker_affordance.dart';
+import '../../core/services/developer_log_service.dart';
 import '../../data/repositories/auth_repository.dart';
 
 class AuthOtpScreen extends StatefulWidget {
@@ -93,6 +94,7 @@ class _AuthOtpScreenState extends State<AuthOtpScreen> {
   }
 
   Future<void> _handleVerify() async {
+    DeveloperLogService.log('[USER ACTION] User initiated Verify OTP');
     final otp = _otpController.text.trim();
     if (otp.length != 6) {
       setState(() => _errorMessage = 'invalid_otp'.tr());
@@ -265,10 +267,43 @@ class _AuthOtpScreenState extends State<AuthOtpScreen> {
                 onPressed: _handleVerify,
               ),
               const SizedBox(height: 12),
+              Center(
+                child: TextButton(
+                  onPressed: _isLoading ? null : _handleResendOtp,
+                  child: Text(
+                    'resend_otp'.tr(),
+                    style: AppTextStyles.bodyMedium(color: AppColors.primary),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _handleResendOtp() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+    try {
+      final debugOtp = await _authRepo.sendOtp(widget.phone);
+      if (!mounted) return;
+      if (debugOtp != null && debugOtp.isNotEmpty) {
+        _otpController.text = debugOtp;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('otp_resent_mock'.tr())),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      final resolved = NetworkErrorHelper.resolve(e);
+      setState(() => _errorMessage = resolved.message);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 }

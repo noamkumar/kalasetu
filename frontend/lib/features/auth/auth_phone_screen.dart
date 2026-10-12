@@ -12,6 +12,7 @@ import '../../core/widgets/app_button.dart';
 import '../../core/widgets/big_numeric_keypad.dart';
 import '../../core/widgets/language_picker.dart';
 import '../../core/widgets/speaker_affordance.dart';
+import '../../core/services/developer_log_service.dart';
 import '../../core/utils/network_error_helper.dart';
 import '../../data/api/api_client.dart';
 import '../../data/repositories/auth_repository.dart';
@@ -84,13 +85,23 @@ class _AuthPhoneScreenState extends State<AuthPhoneScreen> {
   }
 
   Future<void> _handleSendOtp() async {
+    DeveloperLogService.log('[USER ACTION] User initiated Send OTP');
     final phone = _phoneController.text.trim();
-    if (phone.length < 10) {
+    if (phone.length != 10 || !RegExp(r'^\d{10}$').hasMatch(phone)) {
       setState(() => _errorMessage = 'phone_invalid'.tr());
       SimpleModeVoiceHelper.showFriendlyErrorDialog(
         context,
         title: 'check_phone_title'.tr(),
         message: 'phone_invalid'.tr(),
+      );
+      return;
+    }
+    if (!RegExp(r'^[6-9]').hasMatch(phone)) {
+      setState(() => _errorMessage = 'phone_invalid_indian'.tr());
+      SimpleModeVoiceHelper.showFriendlyErrorDialog(
+        context,
+        title: 'check_phone_title'.tr(),
+        message: 'phone_invalid_indian'.tr(),
       );
       return;
     }
@@ -103,8 +114,15 @@ class _AuthPhoneScreenState extends State<AuthPhoneScreen> {
     try {
       final debugOtp = await _authRepo.sendOtp(phone);
       if (!mounted) return;
-      SimpleModeVoiceHelper.playSuccessFeedback(context, 'otp_sent_spoken'.tr());
-      context.go('${RouteNames.authOtp}?phone=$phone&debug_otp=${debugOtp ?? ""}');
+      final targetUri = Uri(
+        path: RouteNames.authOtp,
+        queryParameters: {
+          'phone': phone,
+          if (debugOtp != null && debugOtp.isNotEmpty) 'debug_otp': debugOtp,
+        },
+      );
+      context.go(targetUri.toString());
+
     } catch (e) {
       if (!mounted) return;
       final resolved = NetworkErrorHelper.resolve(e);

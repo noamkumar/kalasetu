@@ -63,7 +63,25 @@ void main() {
     );
   }
 
-  group('AuthRepository Phone Normalization & Demo Detection', () {
+  group('AuthRepository Phone Validation, Normalization & Demo Detection', () {
+    test('isValidIndianMobile validates 10-digit Indian numbers starting with 6, 7, 8, or 9', () {
+      expect(AuthRepository.isValidIndianMobile('9876543210'), isTrue);
+      expect(AuthRepository.isValidIndianMobile('8123456789'), isTrue);
+      expect(AuthRepository.isValidIndianMobile('7000111222'), isTrue);
+      expect(AuthRepository.isValidIndianMobile('6999888777'), isTrue);
+      expect(AuthRepository.isValidIndianMobile('+919876543210'), isTrue);
+      expect(AuthRepository.isValidIndianMobile('919876543210'), isTrue);
+      expect(AuthRepository.isValidIndianMobile('09876543210'), isTrue);
+
+      // Invalid cases
+      expect(AuthRepository.isValidIndianMobile('1234567890'), isFalse);
+      expect(AuthRepository.isValidIndianMobile('5555555555'), isFalse);
+      expect(AuthRepository.isValidIndianMobile('98765'), isFalse);
+      expect(AuthRepository.isValidIndianMobile('98765432101234'), isFalse);
+      expect(AuthRepository.isValidIndianMobile('98765abcde'), isFalse);
+      expect(AuthRepository.isValidIndianMobile(''), isFalse);
+    });
+
     test('normalizePhone formats Indian numbers to E.164 +91 format', () {
       expect(AuthRepository.normalizePhone('9876543210'), equals('+919876543210'));
       expect(AuthRepository.normalizePhone('+919876543210'), equals('+919876543210'));
@@ -98,7 +116,7 @@ void main() {
           final body = json.decode(request.body) as Map<String, dynamic>;
           sentPhone = body['phone'];
           return http.Response(
-            json.encode({'message': 'OTP sent successfully', 'debug_otp': '123456'}),
+            json.encode({'message': 'Demo mode: Enter 123456 to continue', 'debug_otp': '123456'}),
             200,
             headers: {'content-type': 'application/json'},
           );
@@ -109,8 +127,8 @@ void main() {
       final apiClient = ApiClient(client: mockHttpClient);
       final authRepo = AuthRepository(apiClient: apiClient);
 
-      final debugOtp = await authRepo.sendOtp('9876543210');
-      expect(sentPhone, equals('+919876543210'));
+      final debugOtp = await authRepo.sendOtp('9123456789');
+      expect(sentPhone, equals('+919123456789'));
       expect(debugOtp, equals('123456'));
     });
 
@@ -151,8 +169,8 @@ void main() {
       final apiClient = ApiClient(client: mockHttpClient);
       final authRepo = AuthRepository(apiClient: apiClient);
 
-      final isNewUser = await authRepo.verifyOtp('9876543210', '123456');
-      expect(sentPhone, equals('+919876543210'));
+      final isNewUser = await authRepo.verifyOtp('9123456789', '123456');
+      expect(sentPhone, equals('+919123456789'));
       expect(sentOtp, equals('123456'));
       expect(isNewUser, isFalse);
     });
@@ -175,7 +193,7 @@ void main() {
   });
 
   group('AuthOtpScreen Widget Rendering', () {
-    testWidgets('Demo account auto-fills 123456 and renders demo hint banner', (tester) async {
+    testWidgets('Documented demo account auto-fills 123456 and renders demo hint banner', (tester) async {
       await tester.binding.setSurfaceSize(const Size(400, 800));
       await tester.pumpWidget(
         buildTestableWidget(
@@ -195,7 +213,27 @@ void main() {
       expect(find.textContaining('+91 9876543210'), findsOneWidget);
     });
 
-    testWidgets('Non-demo real account hides demo hint banner and does NOT prefill 123456', (tester) async {
+    testWidgets('Any valid mobile number with debugOtp 123456 displays demo banner and auto-fills 123456', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(400, 800));
+      await tester.pumpWidget(
+        buildTestableWidget(
+          const AuthOtpScreen(phone: '9123456789', debugOtp: '123456'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Demo banner icon is present
+      expect(find.byIcon(Icons.info_outline), findsOneWidget);
+
+      // OTP TextField has 123456 auto-filled
+      final textField = tester.widget<TextField>(find.byType(TextField));
+      expect(textField.controller?.text, equals('123456'));
+
+      // Subtitle cleanly displays +91 9123456789
+      expect(find.textContaining('+91 9123456789'), findsOneWidget);
+    });
+
+    testWidgets('Non-demo number without debugOtp hides demo hint banner and does NOT prefill 123456', (tester) async {
       await tester.binding.setSurfaceSize(const Size(400, 800));
       await tester.pumpWidget(
         buildTestableWidget(

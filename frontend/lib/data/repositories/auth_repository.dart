@@ -5,6 +5,40 @@ import '../api/api_client.dart';
 class AuthRepository {
   final ApiClient _apiClient;
 
+  static const Set<String> demoPhoneNumbers = {
+    '+919876543210', '9876543210',
+    '+919876543211', '9876543211',
+    '+919876543212', '9876543212',
+    '+919876543220', '9876543220',
+    '+919876543221', '9876543221',
+  };
+
+  static String normalizePhone(String rawPhone) {
+    final clean = rawPhone.trim().replaceAll(RegExp(r'[\s\-]'), '');
+    if (clean.startsWith('+91') && clean.length == 13) {
+      return clean;
+    }
+    if (clean.startsWith('+')) {
+      return clean;
+    }
+    if (clean.startsWith('0') && clean.length == 11) {
+      return '+91${clean.substring(1)}';
+    }
+    if (clean.startsWith('91') && clean.length == 12) {
+      return '+$clean';
+    }
+    if (clean.length == 10 && RegExp(r'^\d{10}$').hasMatch(clean)) {
+      return '+91$clean';
+    }
+    return clean;
+  }
+
+  static bool isDemoPhone(String rawPhone) {
+    final norm = normalizePhone(rawPhone);
+    final raw10 = norm.startsWith('+91') ? norm.substring(3) : norm;
+    return demoPhoneNumbers.contains(norm) || demoPhoneNumbers.contains(raw10);
+  }
+
   AuthRepository({ApiClient? apiClient}) : _apiClient = apiClient ?? ApiClient();
 
   bool _isTransient(dynamic error) {
@@ -22,13 +56,14 @@ class AuthRepository {
   }
 
   Future<String?> sendOtp(String phone, {int maxRetries = 2}) async {
+    final normalized = normalizePhone(phone);
     int attempt = 0;
     while (true) {
       try {
         attempt++;
         final response = await _apiClient.post(
           '/api/v1/auth/otp/send',
-          body: {'phone': phone},
+          body: {'phone': normalized},
         );
         if (response is Map) {
           return response['debug_otp']?.toString();
@@ -47,13 +82,14 @@ class AuthRepository {
   }
 
   Future<bool> verifyOtp(String phone, String otp, {int maxRetries = 2}) async {
+    final normalized = normalizePhone(phone);
     int attempt = 0;
     while (true) {
       try {
         attempt++;
         final response = await _apiClient.post(
           '/api/v1/auth/otp/verify',
-          body: {'phone': phone, 'otp': otp},
+          body: {'phone': normalized, 'otp': otp},
         );
         if (response is Map && response.containsKey('access_token')) {
           final token = response['access_token'] as String;
@@ -63,7 +99,7 @@ class AuthRepository {
           await StorageService.saveAuthTokens(
             accessToken: token,
             refreshToken: refresh,
-            phone: phone,
+            phone: normalized,
           );
 
           // Attempt to load current profile

@@ -783,3 +783,38 @@ This log documents all architectural choices, assumptions, trade-offs, and defau
   5. Isolated Deployment via `.vercelignore`: Configured root and frontend `.vercelignore` files to cleanly ignore backend, tooling, and mobile directories (`android/`, `ios/`, etc.) so only web assets are bundled.
   6. CI Project Settings Inspection: Added a pre-deployment REST API query step in `.github/workflows/deploy-web.yml` to inspect and log remote Vercel project settings (`rootDirectory`, `framework`, `buildCommand`, `outputDirectory`).
 
+---
+
+## Decision 040: Android Release Startup Crash Resolution & ProGuard Configuration
+- **Date**: 2026-10-12
+- **Status**: Accepted
+- **Context**: Release APK (`com.kalasetu.app`) installed successfully on physical devices but crashed immediately on launch (<150ms). Logcat confirmed an unhandled `FATAL EXCEPTION: main` inside `androidx.startup.InitializationProvider` during `ActivityThread.installProvider`: `java.lang.RuntimeException: Failed to create an instance of class androidx.work.impl.WorkDatabase.canonicalName`. R8 code shrinking/obfuscation in release builds stripped and renamed `androidx.work` and Room reflection implementation classes (`WorkDatabase_Impl`).
+- **Architectural Implementation**:
+  1. Root Cause Identification: WorkManagerInitializer runs automatically at process startup via AndroidX App Startup (`InitializationProvider`) before `MainActivity.onCreate`. Room builds `WorkDatabase` using reflection on its canonical name, which was obfuscated or stripped by R8 when `proguardFiles` was unconfigured.
+  2. ProGuard/R8 Rules (`frontend/android/app/proguard-rules.pro`): Configured explicit keep rules preserving `androidx.work.**`, `androidx.room.**`, `androidx.startup.**`, `dev.fluttercommunity.workmanager.**`, and application classes.
+  3. Release Build Configuration (`frontend/android/app/build.gradle.kts`): Configured `isMinifyEnabled = true`, `isShrinkResources = false`, and attached `getDefaultProguardFile("proguard-android-optimize.txt")` and `proguard-rules.pro` to `buildTypes.release`.
+  4. Script Backend Alignment (`scripts/build_release.ps1`): Updated the default `ApiBaseUrl` parameter to match the active deployed backend (`https://kalasetu-backend-s3uq.onrender.com/api/v1`).
+  5. Verification: Compiled signed release APK with existing keystore, verified clean install and sustained execution (`pidof com.kalasetu.app`) on physical device `8985f3d3`, confirmed full Flutter engine and UI initialization without crash.
+
+---
+
+## Decision 041: Phone Number Normalization, Demo OTP 123456 Verification & Security Parity
+- **Date**: 2026-10-12
+- **Status**: Accepted
+- **Context**: On the Verify Phone screen, entering demo OTP `123456` for documented demo accounts (e.g. `9876543210`) resulted in an "Invalid or expired OTP code" error inside a "Check Phone Number" dialog when testing against the deployed backend (`https://kalasetu-backend-s3uq.onrender.com`).
+- **Root Causes**:
+  1. Phone Number Format Mismatch: Flutter `AuthPhoneScreen` displayed an uneditable `🇮🇳 +91` prefix and captured 10 digits (`9876543210`). When requesting OTP, the frontend sent `"9876543210"` without the `+91` country code. The backend's `DEMO_PHONE_NUMBERS` only contained strings starting with `+91` (`"+919876543210"`). In production mode (`APP_ENV="production"` on Render), `is_demo_phone("9876543210")` returned `False`, causing `send_otp` to issue a random 6-digit OTP instead of `123456` and omitting `debug_otp`. When the user entered `123456`, verification failed against the random stored OTP.
+  2. Database Lookup Discrepancy: Demo users are seeded in the database with `phone: "+919876543210"`. Looking up by `"9876543210"` failed to match the seeded profile, resulting in new blank user creation.
+  3. Misleading UI Copy & Unconditional Banner: `AuthOtpScreen` unconditionally rendered `debug_otp_hint` stating `"Demo: Any 6-digit code or 123456 works"` for all phone numbers. Arbitrary 6-digit codes were never accepted by the backend, and non-demo numbers in production require actual SMS OTP verification.
+  4. Error Title Mapping: `NetworkErrorHelper.resolve` mapped all 400 errors to `check_phone_title` ("Check Phone Number"), presenting a confusing title for OTP verification failures.
+- **Architectural Implementation**:
+  1. Frontend Normalization (`AuthRepository.normalizePhone` & `AuthRepository.isDemoPhone`): Automatically normalizes Indian mobile numbers to E.164 `+91` format for API calls and token storage.
+  2. Backend Normalization (`app.services.auth_service.normalize_phone`): Normalizes 10-digit, 11-digit (with 0), 12-digit (with 91), and E.164 formats to `+91` standard across OTP issuance, verification, and rate limiting (`CostGuard`).
+  3. Multi-Format Database Resolution: In `handle_verify_otp`, searches for users by `norm`, `phone`, or `raw_10` to reliably match seeded accounts and avoid creating duplicate empty profiles.
+  4. Conditional Demo UI: `AuthOtpScreen` only displays the demo hint banner when verifying a recognized demo account or when `debug_otp` is provided by the server. Real phone numbers in production see standard verification flow without misleading demo instructions.
+  5. Accurate Multilingual Copy: Replaced `"Demo: Any 6-digit code or 123456 works"` across all 7 translation files (`en`, `hi`, `ta`, `te`, `kn`, `ml`, `bn`) with `"Demo Account: Enter 123456 to verify"`.
+  6. OTP Error Title Discrimination: `NetworkErrorHelper.resolve` maps OTP-related errors to `check_otp_title` ("Enter Verification Code").
+  7. Automated Tests: Added `backend/tests/test_auth_verification.py` (7 tests) and `frontend/test/auth_otp_flow_test.dart` (7 tests) covering demo accounts, dynamic OTP, wrong OTP rejection, expiration, and UI state.
+
+
+

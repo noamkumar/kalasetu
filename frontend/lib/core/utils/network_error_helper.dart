@@ -36,8 +36,9 @@ class NetworkErrorHelper {
           final isFriendly = error.message.isNotEmpty &&
               !error.message.startsWith('Server error') &&
               !error.message.contains('{');
+          final isOtpError = error.message.toLowerCase().contains('otp');
           return ResolvedNetworkError(
-            title: 'check_phone_title'.tr(),
+            title: isOtpError ? 'check_otp_title'.tr() : 'check_phone_title'.tr(),
             message: isFriendly ? error.message : 'error_validation_msg'.tr(),
             type: ApiErrorType.validationError,
             statusCode: error.statusCode,

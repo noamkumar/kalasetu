@@ -33,11 +33,26 @@ class _AuthOtpScreenState extends State<AuthOtpScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
+  bool get _isDemo =>
+      (widget.debugOtp != null && widget.debugOtp!.isNotEmpty) ||
+      AuthRepository.isDemoPhone(widget.phone);
+
+  String get _displayPhone {
+    final raw = widget.phone.trim();
+    if (raw.startsWith('+91')) {
+      final digits = raw.substring(3);
+      return '+91 $digits';
+    }
+    return '+91 $raw';
+  }
+
   @override
   void initState() {
     super.initState();
     if (widget.debugOtp != null && widget.debugOtp!.isNotEmpty) {
       _otpController.text = widget.debugOtp!;
+    } else if (AuthRepository.isDemoPhone(widget.phone)) {
+      _otpController.text = '123456';
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       SimpleModeVoiceHelper.autoSpeakScreenInstruction(
@@ -126,7 +141,9 @@ class _AuthOtpScreenState extends State<AuthOtpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currentLang = context.locale.languageCode;
+    final currentLang = EasyLocalization.of(context)?.locale.languageCode ??
+        Localizations.maybeLocaleOf(context)?.languageCode ??
+        'en';
     final isSimple = StorageService.isSimpleMode;
 
     return Scaffold(
@@ -161,33 +178,35 @@ class _AuthOtpScreenState extends State<AuthOtpScreen> {
               ),
               const SizedBox(height: 6),
               Text(
-                '${'verify_phone_subtitle'.tr()} +91 ${widget.phone}',
+                '${'verify_phone_subtitle'.tr()} $_displayPhone',
                 style: AppTextStyles.bodyMedium(color: AppColors.inkSecondary),
               ),
               const SizedBox(height: 16),
 
-              // Dev hint banner
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: AppColors.secondaryLight,
-                  borderRadius: AppRadii.inputRadius,
-                  border: Border.all(color: AppColors.secondary.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.info_outline, color: AppColors.secondary, size: 20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'debug_otp_hint'.tr(),
-                        style: AppTextStyles.bodySmall(color: AppColors.inkPrimary),
+              // Demo hint banner (shown ONLY for demo accounts or when debug_otp is present)
+              if (_isDemo) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.secondaryLight,
+                    borderRadius: AppRadii.inputRadius,
+                    border: Border.all(color: AppColors.secondary.withValues(alpha: 0.3)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.info_outline, color: AppColors.secondary, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'debug_otp_hint'.tr(),
+                          style: AppTextStyles.bodySmall(color: AppColors.inkPrimary),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
+              ],
 
               // Large OTP Input Container
               Container(

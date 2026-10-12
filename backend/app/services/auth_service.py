@@ -28,45 +28,69 @@ DEMO_PHONE_NUMBERS = {
     "+919876543221",
 }
 
-def is_demo_phone(phone: str) -> bool:
+def normalize_phone(phone: str) -> str:
+    """Normalize phone number to E.164 (+91) format for Indian mobile numbers."""
     clean = phone.strip().replace(" ", "").replace("-", "")
-    return clean in DEMO_PHONE_NUMBERS
+    if clean.startswith("+91") and len(clean) == 13:
+        return clean
+    if clean.startswith("+"):
+        return clean
+    if clean.startswith("0") and len(clean) == 11:
+        return "+91" + clean[1:]
+    if clean.startswith("91") and len(clean) == 12:
+        return "+" + clean
+    if len(clean) == 10 and clean.isdigit():
+        return "+91" + clean
+    return clean
+
+def is_demo_phone(phone: str) -> bool:
+    norm = normalize_phone(phone)
+    raw_10 = norm[3:] if norm.startswith("+91") else norm
+    return norm in DEMO_PHONE_NUMBERS or raw_10 in {p.replace("+91", "") for p in DEMO_PHONE_NUMBERS}
 
 def send_otp(phone: str) -> str:
     """Generate and store OTP. In dev or for demo accounts, uses 123456. In prod for real accounts, generates random OTP."""
     import secrets
+    norm = normalize_phone(phone)
     clean = phone.strip().replace(" ", "").replace("-", "")
-    if is_demo_phone(clean) or settings.APP_ENV == "development":
+    if is_demo_phone(norm) or settings.APP_ENV == "development":
         otp = "123456"
     else:
         otp = f"{secrets.randbelow(900000) + 100000}"
 
-    _otp_store[clean] = {
+    record = {
         "otp": otp,
         "expires_at": time.time() + 600  # 10 minutes
     }
-    logger.info(f"[OTP] Phone: {clean} => OTP issued (demo: {is_demo_phone(clean)})")
-    if settings.APP_ENV == "development" or is_demo_phone(clean):
-        print(f"\n=======================================================\n[AUTH OTP] Phone: {clean} => OTP: {otp}\n=======================================================\n")
+    _otp_store[norm] = record
+    if clean != norm:
+        _otp_store[clean] = record
+
+    logger.info(f"[OTP] Phone: {norm} => OTP issued (demo: {is_demo_phone(norm)})")
+    if settings.APP_ENV == "development" or is_demo_phone(norm):
+        print(f"\n=======================================================\n[AUTH OTP] Phone: {norm} => OTP: {otp}\n=======================================================\n")
     return otp
 
 def verify_otp(phone: str, otp: str) -> bool:
     """Verify phone and OTP match. Fixed OTP 123456 is accepted ONLY for demo numbers."""
+    norm = normalize_phone(phone)
     clean = phone.strip().replace(" ", "").replace("-", "")
 
     # Fixed OTP 123456 is accepted ONLY for demo accounts
-    if is_demo_phone(clean) and otp == "123456":
+    if is_demo_phone(norm) and otp == "123456":
         return True
 
     # Real numbers must match the dynamically issued OTP
-    record = _otp_store.get(clean)
+    record = _otp_store.get(norm) or _otp_store.get(clean)
     if not record:
         return False
     if time.time() > record["expires_at"]:
-        del _otp_store[clean]
+        _otp_store.pop(norm, None)
+        _otp_store.pop(clean, None)
         return False
     if record["otp"] == otp:
-        del _otp_store[clean]
+        _otp_store.pop(norm, None)
+        _otp_store.pop(clean, None)
         return True
     return False
 

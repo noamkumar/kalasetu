@@ -7,7 +7,8 @@ from app.models.schemas import (
     ArtisanResponse, ArtisanUpdate
 )
 from app.services.auth_service import (
-    send_otp, verify_otp, create_access_token, create_refresh_token,
+    send_otp, verify_otp, normalize_phone, is_demo_phone,
+    create_access_token, create_refresh_token,
     get_current_artisan
 )
 from app.config import get_settings
@@ -20,8 +21,9 @@ def handle_send_otp(req: OTPSendRequest):
     phone = req.phone.strip().replace(" ", "").replace("-", "")
     if len(phone) < 10:
         raise HTTPException(status_code=400, detail="Invalid phone number format")
-    otp = send_otp(phone)
-    debug_hint = otp if settings.APP_ENV == "development" else None
+    norm = normalize_phone(phone)
+    otp = send_otp(norm)
+    debug_hint = otp if (settings.APP_ENV == "development" or is_demo_phone(norm)) else None
     return OTPSendResponse(
         message="OTP sent successfully",
         debug_otp=debug_hint
@@ -30,13 +32,22 @@ def handle_send_otp(req: OTPSendRequest):
 @router.post("/auth/otp/verify", response_model=TokenResponse)
 def handle_verify_otp(req: OTPVerifyRequest, db: Session = Depends(get_db)):
     phone = req.phone.strip().replace(" ", "").replace("-", "")
-    if not verify_otp(phone, req.otp):
+    if len(phone) < 10:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid phone number format"
+        )
+    norm = normalize_phone(phone)
+    if not verify_otp(norm, req.otp):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid or expired OTP code"
         )
-    # Find or create artisan
-    artisan = db.query(Artisan).filter(Artisan.phone == phone).first()
+    # Find or create artisan matching normalized, raw 10-digit, or entered format
+    raw_10 = norm[3:] if norm.startswith("+91") else norm
+    artisan = db.query(Artisan).filter(
+        (Artisan.phone == norm) | (Artisan.phone == phone) | (Artisan.phone == raw_10)
+    ).first()
     is_new_user = False
     if not artisan:
         is_new_user = True

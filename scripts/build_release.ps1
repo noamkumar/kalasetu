@@ -4,7 +4,7 @@
 # ==============================================================================
 [CmdletBinding()]
 param (
-    [string]$ApiBaseUrl = "https://kalasetu-backend.onrender.com/api/v1"
+    [string]$ApiBaseUrl = "https://kalasetu-backend-s3uq.onrender.com/api/v1"
 )
 
 $ErrorActionPreference = "Stop"

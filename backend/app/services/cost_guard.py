@@ -4,7 +4,7 @@ from typing import Dict, Optional, Tuple
 from fastapi import HTTPException, Request, Depends, status
 
 from app.config import get_settings
-from app.services.auth_service import get_current_user_optional
+from app.services.auth_service import get_current_user_optional, is_demo_phone
 
 logger = logging.getLogger("kalasetu.cost_guard")
 
@@ -104,13 +104,7 @@ async def check_gemini_quota_dependency(
     lang = "en"
 
     if user:
-        is_demo = user.phone in {
-            "+919876543210",
-            "+919876543211",
-            "+919876543212",
-            "+919876543220",
-            "+919876543221",
-        }
+        is_demo = is_demo_phone(user.phone)
         lang = getattr(user, "preferred_language", "en")
 
     # Check query/header for language preference

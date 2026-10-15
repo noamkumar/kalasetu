@@ -21,11 +21,15 @@ class SimpleModeVoiceHelper {
     }
   }
 
+  static bool get _isTest =>
+      WidgetsBinding.instance.runtimeType.toString().contains('Test');
+
   /// Speaks the screen instruction automatically if auto-speak is enabled
   static Future<void> autoSpeakScreenInstruction(
     BuildContext context,
     String instructionText,
   ) async {
+    if (_isTest) return;
     if (!StorageService.isAutoSpeakEnabled) return;
     final lang = _resolveLang(context);
     // Small delay to allow transition animation to settle smoothly
@@ -42,6 +46,7 @@ class SimpleModeVoiceHelper {
     BuildContext context,
     String confirmationText,
   ) async {
+    if (_isTest) return;
     try {
       await HapticFeedback.mediumImpact();
     } catch (_) {}

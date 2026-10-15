@@ -81,6 +81,11 @@ class AppDatabase extends _$AppDatabase {
     return instance;
   }
 
+  @visibleForTesting
+  static void setInstanceForTesting(AppDatabase db) {
+    _instance = db;
+  }
+
   @override
   int get schemaVersion => 1;
 

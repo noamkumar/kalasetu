@@ -906,3 +906,21 @@ This log documents all architectural choices, assumptions, trade-offs, and defau
 
 
 
+
+---
+
+## Decision 045: Product Publishing Navigation Bug & Catalog Routing Fix
+- **Date**: 2026-10-15
+- **Status**: Accepted
+- **Context**: When clicking the "Publish" button on Step 4 of the product publishing wizard, users reported that the application displayed "Product Not Found" instead of returning to the main Catalog page with their newly published item refreshed.
+- **Root Cause Analysis**:
+  1. **GoRouter Route Shadowing**: In `lib/core/routing/app_router.dart`, `GoRoute(path: '/product/:id', name: 'product_detail')` was declared ahead of `GoRoute(path: RouteNames.publishedSuccess, name: 'published_success')` (`/product/published-success`). When navigation targeted `/product/published-success`, GoRouter matched `:id = 'published-success'`, invoking `ProductDetailScreen(productId: 'published-success')`. Since no product ID matched that string, the screen rendered "Product not found".
+  2. **Incorrect Simple Mode Navigation Route**: `SimpleAddProductScreen._handlePublish()` navigated to `/product/published-success` instead of the user's primary Catalog screen (`/home?tab=1`).
+  3. **Shell Tab State Sync**: When navigating to `/home?tab=1` while `HomeShell` was already mounted, `HomeShell` did not implement `didUpdateWidget`, preventing the active tab from switching to the Catalogue tab.
+  4. **Catalog Stream Re-subscription Loop**: `CatalogueScreen` was re-instantiating `_productRepo.watchProducts(lang)` directly inside `build()`, which forced `StreamBuilder` to unsubscribe and resubscribe on every rebuild.
+- **Resolution**:
+  1. Re-ordered routes in `app_router.dart` so specific routes (`/product/published-success`) are evaluated prior to dynamic path-parameter routes (`/product/:id`).
+  2. Updated `_handlePublish()` in `simple_add_product_screen.dart` to await successful creation, clear draft state, refresh repository cache via `_productRepo.refreshProducts(curLang)`, play voice/haptic feedback, show a success snackbar, and navigate cleanly to `${RouteNames.home}?tab=1`.
+  3. Added `didUpdateWidget` in `HomeShell` to dynamically switch tabs when `initialTab` changes.
+  4. Cached `_productsStream` in `_CatalogueScreenState` and exposed optional `productsStream` and `enableRefresh` dependency injection hooks for unit testing and re-render stability.
+  5. Added comprehensive automated tests in `frontend/test/publish_navigation_bug_fix_test.dart` verifying route resolution, tab switching, and publish success navigation.

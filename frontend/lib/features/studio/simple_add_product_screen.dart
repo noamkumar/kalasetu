@@ -1041,6 +1041,11 @@ class _SimpleAddProductScreenState extends State<SimpleAddProductScreen> {
       // Clear draft
       await StorageService.clearProductDraft();
 
+      // Refresh repository cache so newly published product appears in catalog
+      try {
+        await _productRepo.refreshProducts(curLang);
+      } catch (_) {}
+
       if (!mounted) return;
       await SimpleModeVoiceHelper.playSuccessFeedback(
         context,
@@ -1048,10 +1053,15 @@ class _SimpleAddProductScreenState extends State<SimpleAddProductScreen> {
       );
 
       if (!mounted) return;
-      // Navigate to Published Success Screen (from which 'Go to My Shop' opens catalogue with product at top)
-      context.go(
-        '/product/published-success?product_id=$prodId&title=${Uri.encodeComponent(titleText)}&price=$_selectedPrice&image_url=${Uri.encodeComponent(heroUrl)}',
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('listing_online_success'.tr()),
+          backgroundColor: AppColors.statusOnline,
+        ),
       );
+
+      // Navigate directly to the existing main Catalog page using project's established routing pattern
+      context.go('${RouteNames.home}?tab=1');
     } catch (_) {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -2282,6 +2292,7 @@ class _SimpleAddProductScreenState extends State<SimpleAddProductScreen> {
         SizedBox(
           height: 64,
           child: ElevatedButton.icon(
+            key: const Key('yes_publish_btn'),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.statusOnline,
               foregroundColor: Colors.white,

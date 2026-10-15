@@ -13,6 +13,7 @@ import '../../core/widgets/language_picker.dart';
 import '../../core/widgets/motifs/warli_painter.dart';
 import '../../core/widgets/step_progress_bar.dart';
 import '../../data/repositories/order_repository.dart';
+import '../../data/repositories/product_repository.dart';
 import '../catalogue/catalogue_screen.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../kalamitra/kalamitra_bottom_sheet.dart';
@@ -43,8 +44,13 @@ class _CraftNavItem {
 /// 4. Subtle Warli watermark pattern on background
 class HomeShell extends StatefulWidget {
   final int initialTab;
+  final Stream<List<DisplayProduct>>? catalogueProductsStream;
 
-  const HomeShell({super.key, this.initialTab = 1});
+  const HomeShell({
+    super.key,
+    this.initialTab = 1,
+    this.catalogueProductsStream,
+  });
 
   @override
   State<HomeShell> createState() => _HomeShellState();
@@ -79,6 +85,21 @@ class _HomeShellState extends State<HomeShell> {
       setState(() {
         _currentTab = StorageService.isBuyer ? 0 : 1;
       });
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialTab != widget.initialTab) {
+      setState(() {
+        if (StorageService.isBuyer) {
+          _currentTab = (widget.initialTab == 1) ? 0 : (widget.initialTab <= 2 ? widget.initialTab : 0);
+        } else {
+          _currentTab = widget.initialTab;
+        }
+      });
+      _loadUnreadCount();
     }
   }
 
@@ -229,13 +250,19 @@ class _HomeShellState extends State<HomeShell> {
         case 1:
           return const ImageStudioScreen();
         case 2:
-          return const CatalogueScreen(showHeaderRow: false);
+          return CatalogueScreen(
+            showHeaderRow: false,
+            productsStream: widget.catalogueProductsStream,
+          );
         case 3:
           return const OrdersScreen();
         case 4:
           return const ProfileScreen();
         default:
-          return const CatalogueScreen(showHeaderRow: false);
+          return CatalogueScreen(
+            showHeaderRow: false,
+            productsStream: widget.catalogueProductsStream,
+          );
       }
     } else {
       switch (tab) {
@@ -244,7 +271,10 @@ class _HomeShellState extends State<HomeShell> {
               ? const SimpleAddProductScreen(showAppBar: false)
               : const ImageStudioScreen();
         case 1:
-          return const CatalogueScreen(showHeaderRow: false);
+          return CatalogueScreen(
+            showHeaderRow: false,
+            productsStream: widget.catalogueProductsStream,
+          );
         case 2:
           return const OrdersScreen();
         case 3:
@@ -254,7 +284,10 @@ class _HomeShellState extends State<HomeShell> {
             onNavigateTab: (index) => setState(() => _currentTab = index),
           );
         default:
-          return const CatalogueScreen(showHeaderRow: false);
+          return CatalogueScreen(
+            showHeaderRow: false,
+            productsStream: widget.catalogueProductsStream,
+          );
       }
     }
   }

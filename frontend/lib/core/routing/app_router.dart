@@ -109,6 +109,22 @@ final GoRouter appRouter = GoRouter(
       },
     ),
     GoRoute(
+      path: RouteNames.publishedSuccess,
+      name: 'published_success',
+      builder: (context, state) {
+        final productId = state.uri.queryParameters['product_id'] ?? '';
+        final title = state.uri.queryParameters['title'] ?? 'Handmade Craft';
+        final price = int.tryParse(state.uri.queryParameters['price'] ?? '0') ?? 0;
+        final imageUrl = state.uri.queryParameters['image_url'];
+        return ProductPublishedSuccessScreen(
+          productId: productId,
+          title: title,
+          price: price,
+          imageUrl: imageUrl,
+        );
+      },
+    ),
+    GoRoute(
       path: '/product/:id',
       name: 'product_detail',
       builder: (context, state) {
@@ -216,22 +232,6 @@ final GoRouter appRouter = GoRouter(
       path: RouteNames.simpleAdd,
       name: 'simple_add',
       builder: (context, state) => const SimpleAddProductScreen(),
-    ),
-    GoRoute(
-      path: RouteNames.publishedSuccess,
-      name: 'published_success',
-      builder: (context, state) {
-        final productId = state.uri.queryParameters['product_id'] ?? '';
-        final title = state.uri.queryParameters['title'] ?? 'Handmade Craft';
-        final price = int.tryParse(state.uri.queryParameters['price'] ?? '0') ?? 0;
-        final imageUrl = state.uri.queryParameters['image_url'];
-        return ProductPublishedSuccessScreen(
-          productId: productId,
-          title: title,
-          price: price,
-          imageUrl: imageUrl,
-        );
-      },
     ),
     GoRoute(
       path: RouteNames.fairMode,

@@ -46,6 +46,13 @@ class ApiClient {
   static const Duration defaultTimeout = Duration(seconds: 25);
   static const Duration uploadTimeout = Duration(seconds: 75);
 
+  static http.Client? _testClient;
+
+  @visibleForTesting
+  static void setClientForTesting(http.Client? client) {
+    _testClient = client;
+  }
+
   final String? _configuredBaseUrl;
   final http.Client _client;
 
@@ -53,7 +60,7 @@ class ApiClient {
     String? baseUrl,
     http.Client? client,
   })  : _configuredBaseUrl = baseUrl,
-        _client = client ?? http.Client();
+        _client = client ?? _testClient ?? http.Client();
 
   /// Returns the active base URL:
   /// 1. Value manually set at runtime via Settings > Developer (stored in Hive)

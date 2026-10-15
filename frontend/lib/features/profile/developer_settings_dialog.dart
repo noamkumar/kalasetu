@@ -101,7 +101,7 @@ class _DeveloperSettingsDialogState extends State<DeveloperSettingsDialog> {
     await StorageService.clearServerBaseUrl();
     ConnectivityService.instance.checkConnectivity();
     setState(() {
-      _controller.text = ApiClient.defaultBaseUrl;
+      _controller.text = ApiClient.compileTimeOrPlatformDefaultUrl;
       _testMessage = null;
       _testSuccess = null;
     });
@@ -398,10 +398,18 @@ class _DeveloperSettingsDialogState extends State<DeveloperSettingsDialog> {
               runSpacing: 6,
               children: [
                 ActionChip(
-                  label: const Text('Wi-Fi PC (10.124.188.51)'),
+                  label: const Text('Render Production'),
+                  labelStyle: AppTextStyles.labelSmall(color: AppColors.primary).copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  backgroundColor: AppColors.primaryLight,
+                  onPressed: () => _applyPreset('https://kalasetu-backend-s3uq.onrender.com/api/v1'),
+                ),
+                ActionChip(
+                  label: const Text('Wi-Fi PC (10.206.188.51)'),
                   labelStyle: AppTextStyles.labelSmall(color: AppColors.inkPrimary),
                   backgroundColor: AppColors.background,
-                  onPressed: () => _applyPreset('http://10.124.188.51:8000/api/v1'),
+                  onPressed: () => _applyPreset('http://10.206.188.51:8000/api/v1'),
                 ),
                 ActionChip(
                   label: const Text('Localhost (ADB Reverse)'),

@@ -17,6 +17,21 @@ void main() async {
   DeveloperLogService.init();
   // Self-heal server address if saved address does not answer /health
   await ApiClient.healServerAddressOnStartup();
+
+  // Safe startup diagnostic: Selected API hostname & configuration status
+  final activeApiUrl = ApiClient().baseUrl;
+  final parsedApiUri = Uri.tryParse(activeApiUrl);
+  final apiHost = parsedApiUri?.host ?? 'unknown';
+  final isCustomStored = StorageService.serverBaseUrl.isNotEmpty;
+  const compileTimeEnvUrl = String.fromEnvironment('API_BASE_URL');
+  final configSource = isCustomStored
+      ? 'custom_stored'
+      : (compileTimeEnvUrl.isNotEmpty ? 'dart_define' : 'default_fallback');
+  DeveloperLogService.log(
+    '[STARTUP API DIAGNOSTIC] Host: $apiHost | Configured: ${activeApiUrl.isNotEmpty} | Source: $configSource',
+  );
+  debugPrint('[KalaSetu Startup] Selected API Host: $apiHost | Configured: ${activeApiUrl.isNotEmpty} | Source: $configSource');
+
   await SyncService.initializeWorkManager();
   // Remove any already-queued TTS or non-data items on startup
   await AppDatabase.instance.removeQueuedTtsItems();

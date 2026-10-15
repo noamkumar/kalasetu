@@ -15,8 +15,15 @@ import '../../data/repositories/product_repository.dart';
 
 class CatalogueScreen extends StatefulWidget {
   final bool showHeaderRow;
+  final bool enableRefresh;
+  final Stream<List<DisplayProduct>>? productsStream;
 
-  const CatalogueScreen({super.key, this.showHeaderRow = true});
+  const CatalogueScreen({
+    super.key,
+    this.showHeaderRow = true,
+    this.enableRefresh = true,
+    this.productsStream,
+  });
 
   @override
   State<CatalogueScreen> createState() => _CatalogueScreenState();
@@ -30,14 +37,33 @@ class _CatalogueScreenState extends State<CatalogueScreen> {
   CraftCategory? _selectedCategory;
   String _searchQuery = '';
   int _unreadNotifications = 0;
+  Stream<List<DisplayProduct>>? _productsStream;
+  String? _lastLang;
+
+  void _initProductsStream(String lang) {
+    if (_productsStream == null || _lastLang != lang) {
+      _lastLang = lang;
+      _productsStream = widget.productsStream ?? _productRepo.watchProducts(lang);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant CatalogueScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.productsStream != widget.productsStream) {
+      _productsStream = widget.productsStream ?? _productRepo.watchProducts(_lastLang ?? 'en');
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _refresh();
-      _loadUnreadNotifications();
-    });
+    if (widget.enableRefresh) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _refresh();
+        _loadUnreadNotifications();
+      });
+    }
   }
 
   Future<void> _loadUnreadNotifications() async {
@@ -47,8 +73,16 @@ class _CatalogueScreenState extends State<CatalogueScreen> {
     }
   }
 
+  String _safeLang(BuildContext context) {
+    try {
+      return context.locale.languageCode;
+    } catch (_) {
+      return Localizations.maybeLocaleOf(context)?.languageCode ?? 'en';
+    }
+  }
+
   Future<void> _refresh() async {
-    final lang = context.locale.languageCode;
+    final lang = _safeLang(context);
     await _productRepo.refreshProducts(lang);
     await _loadUnreadNotifications();
   }
@@ -56,7 +90,9 @@ class _CatalogueScreenState extends State<CatalogueScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _refresh();
+    if (widget.enableRefresh) {
+      _refresh();
+    }
   }
 
   @override
@@ -128,7 +164,8 @@ class _CatalogueScreenState extends State<CatalogueScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final lang = context.locale.languageCode;
+    final lang = _safeLang(context);
+    _initProductsStream(lang);
 
     return RefreshIndicator(
       color: AppColors.primary,
@@ -303,7 +340,7 @@ class _CatalogueScreenState extends State<CatalogueScreen> {
 
           // 4. StreamBuilder for 2-Column Grid
           StreamBuilder<List<DisplayProduct>>(
-            stream: _productRepo.watchProducts(lang),
+            stream: _productsStream,
             builder: (context, snapshot) {
               final products = snapshot.data ?? [];
 
